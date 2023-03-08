@@ -90,36 +90,38 @@ const ChatSceen = (props) => {
   const renderItem = ({ item }) => {
     if (item.author.user_id == userId) {
       return (
-        <View className='border rounded bg-slate-400 px-2 py-2 mx-2 my-2'>
-          <View className='flex flex-row justify-between'>
-            <Text className='text-base font-semibold  overflow-hidden'>
-              {item.author.first_name}: {item.message}
-            </Text>
-            <Text>{formatDuration(item.timestamp)}</Text>
-          </View>
-          <View className='relative inline-block text-left'>
-            <>
-              <TouchableOpacity
-                onPress={() => {
-                  handleDelete(item.message_id);
-                }}
-              >
-                <Text>Delete</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => {
-                  handleEdit(item.message_id);
-                }}
-              >
-                <Text>Edit</Text>
-              </TouchableOpacity>
-            </>
+        <View className='items-end'>
+          <View className='border rounded w-52 bg-sky-400 px-2 py-2 mx-2 my-2'>
+            <View className='flex flex-row justify-between'>
+              <Text className='text-base font-semibold  overflow-hidden'>
+                {item.author.first_name}: {item.message}
+              </Text>
+              <Text>{formatDuration(item.timestamp)}</Text>
+            </View>
+            <View className='relative inline-block text-left'>
+              <>
+                <TouchableOpacity
+                  onPress={() => {
+                    handleDelete(item.message_id);
+                  }}
+                >
+                  <Text>Delete</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    handleEdit(item.message_id);
+                  }}
+                >
+                  <Text>Edit</Text>
+                </TouchableOpacity>
+              </>
+            </View>
           </View>
         </View>
       );
     } else {
       return (
-        <View className='border rounded bg-sky-400 px-2 py-2 mx-2 my-2'>
+        <View className='border rounded w-52 bg-slate-400 px-2 py-2 mx-2 my-2'>
           <View className='flex flex-row justify-between'>
             <Text className='text-base font-semibold  overflow-hidden'>
               {item.author.first_name}: {item.message}
