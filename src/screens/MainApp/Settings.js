@@ -9,19 +9,29 @@ import {
   UploadUserPhoto,
   getProfilePhoto,
   LogOut,
+  ShowToast,
 } from '../../apiCalls';
 import { Ionicons } from '@expo/vector-icons';
 import { FontAwesome5 } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Settings = (props) => {
   const { navigation } = props;
   const [profile, setProfile] = useState(null);
   const [profilePhoto, setProfilePhoto] = useState(null);
-  const [image, setImage] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [errorGettingUser, setErrorGettingUser] = useState(false);
+  const [getUserSuccess, setGetUserSuccess] = useState(false);
+  const [Unauthorized, setUnauthorized] = useState(false);
+  const [ServerError, setServerError] = useState(false);
+
   async function getUser() {
-    const getUser = await GetUser();
+    setErrorGettingUser(false);
+    setGetUserSuccess(true);
+    const getUser = await GetUser(
+      setGetUserSuccess,
+      setUnauthorized,
+      setErrorGettingUser,
+      setServerError
+    );
     setProfile(getUser);
   }
   async function GetPhoto() {
@@ -37,8 +47,18 @@ const Settings = (props) => {
 
   useEffect(() => {
     getUser();
-
     GetPhoto();
+    if (errorGettingUser) {
+      navigation.navigate(ROUTES.LOGIN);
+    }
+    if (Unauthorized) {
+      navigation.navigate(ROUTES.LOGIN);
+    }
+
+    if (ServerError) {
+      // If there is a server error
+      ShowToast('error', 'Sorry Server Error. Try again.'); // Show a toast
+    }
     const unsubscribe = navigation.addListener('focus', () => {
       // Call the functions that fetch data again to update the state
       getUser();

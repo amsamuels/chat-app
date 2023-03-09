@@ -77,7 +77,7 @@ const Login = (props) => {
     }
     if (serverError) {
       // If there is a server error
-      ShowToast('error', 'Sorry ServerError logging in. Try again.'); // Show a toast
+      ShowToast('error', 'Sorry Server Error logging in. Try again.'); // Show a toast
     }
   }, [loggedIn, icorrectLogin, loginError]);
 

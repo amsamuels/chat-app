@@ -2,7 +2,6 @@ export { default as WelcomeScreen } from './auth/WelcomeScreen';
 export { default as SignUp } from './auth/SignUp';
 export { default as Login } from './auth/Login';
 export { default as Main } from './MainApp/Main';
-export { default as Profile } from './MainApp/Profile';
 export { default as Contacts } from './MainApp/Contacts';
 export { default as Settings } from './MainApp/Settings';
 export { default as EditProfile } from './MainApp/EditProfile';
