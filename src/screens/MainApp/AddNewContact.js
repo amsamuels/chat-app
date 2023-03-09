@@ -5,46 +5,52 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-  TimePickerAndroid,
 } from 'react-native';
 import { useState, useCallback } from 'react';
 import { SearchUser, AddContact, ShowToast } from '../../apiCalls';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
 import { ROUTES } from '../../constants';
+import * as z from 'zod';
 
 const AddNewContact = (props) => {
-  const { navigation } = props;
-  const [contactAdded, setContactAdded] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [addError, setAddError] = useState(false);
-  const [contactSearchResult, setContactSearchResult] = useState([]);
+  const { navigation } = props; // Destructure the navigation prop
+  const [contactAdded, setContactAdded] = useState(false); // State to check if contact is added
+  const [searchQuery, setSearchQuery] = useState(''); // State to store the search query
+  const [addError, setAddError] = useState(false); // State to check if there is an error adding a contact
+  const [contactSearchResult, setContactSearchResult] = useState([]); // State to store the search result
+  const searchSchema = z.string().min(1).max(1000); // Schema to validate the search query
+  const [errorMessage, setErrorMessage] = useState(''); // State to store the error message
 
   const handleSearch = async () => {
     try {
-      const search_in = 'all';
-      const response = await SearchUser(searchQuery, search_in);
-      setContactSearchResult(response);
-      console.log(response);
+      const search_in = 'all'; // Search in all fields
+      const response = await SearchUser(
+        // Call the search user api
+        searchSchema.parse(searchQuery), // Parse the search query
+        search_in
+      );
+      setContactSearchResult(response); // Set the search result
       // Do something with the response data
     } catch (error) {
       // Handle the error
+      setErrorMessage(error.message); // Set the error message
     }
   };
 
   const handleAddContact = useCallback(async (id) => {
     try {
-      setContactAdded(false);
-      setAddError(false);
-      await AddContact(id, setContactAdded, setAddError);
-      setContactAdded(true);
+      setContactAdded(false); // Set contact added to false
+      setAddError(false); // Set add error to false
+      await AddContact(id, setContactAdded, setAddError); // Call the add contact api
+      setContactAdded(true); // Set contact added to true
       setTimeout(() => {
-        ShowToast('success', 'Contact Added Successfully');
+        ShowToast('success', 'Contact Added Successfully'); // Show a toast
       }, 1000);
       // Do something with the response data
     } catch (error) {
-      setAddError(true);
-      ShowToast('error', 'Error Adding Contact');
+      setAddError(true); // Set add error to true
+      ShowToast('error', 'Error Adding Contact'); // Show a toast
       // Handle the error
     }
   });
@@ -61,6 +67,11 @@ const AddNewContact = (props) => {
         </View>
         <>
           <View className='flex p-4'>
+            {errorMessage ? (
+              <Text className='text-red-500 p-1 text-center'>
+                Cannot be empty
+              </Text>
+            ) : null}
             <View className=' inline-flex flex-row  bg-gray-300/50 rounded-lg '>
               <TextInput
                 onChangeText={(text) => setSearchQuery(text)}

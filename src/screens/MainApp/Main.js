@@ -57,7 +57,7 @@ const Main = (props) => {
             <FontAwesome name='wechat' size={24} color='black' />
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => navigation.navigate(ROUTES.CONTACTS)}
+            onPress={() => navigation.navigate(ROUTES.CONTACT_STACK)}
             className={'px-2'}
           >
             <FontAwesome name='users' size={24} color='black' />

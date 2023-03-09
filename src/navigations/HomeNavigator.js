@@ -14,7 +14,7 @@ function HomeStack() {
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name={ROUTES.CONTACTS}
+        name={ROUTES.CONTACT_STACK}
         component={ContactStack}
         options={{ headerShown: false }}
       />
