@@ -7,37 +7,49 @@ import { CreateUser, ShowToast, FormSchema } from '../../apiCalls';
 import { ROUTES } from '../../constants';
 
 const SignUp = (props) => {
-  const { navigation } = props;
+  const { navigation } = props; // Destructure props
   const { ...methods } = useForm({
-    resolver: zodResolver(FormSchema),
+    // Use the useForm hook
+    resolver: zodResolver(FormSchema), // Use the zod resolver
   });
-  const [accountCreated, setAccountCreated] = useState(false);
-  const [signupError, setSignupError] = useState(false);
+  const [accountCreated, setAccountCreated] = useState(false); // State to check if account was created
+  const [signupError, setSignupError] = useState(false); // State to check if there was an error creating the account
+  const [serverError, setServerError] = useState(false); // State to check if there was a server error
 
   const onSubmit = async (data) => {
+    // Function to create a user
     try {
       Keyboard.dismiss();
       setAccountCreated(false);
       setSignupError(false);
-      await CreateUser(data, setAccountCreated, setSignupError);
+      setServerError(false);
+      await CreateUser(data, setAccountCreated, setSignupError, setServerError); // Call the CreateUser function from apiCalls
     } catch (error) {
       console.error('Failed to create user:', error);
     }
   };
   useEffect(() => {
+    // useEffect hook to check if account was created
     if (accountCreated) {
-      ShowToast('success', 'Account created successfully', 'Login to continue');
-      navigation.navigate(ROUTES.LOGIN);
+      // If account was created
+      ShowToast('success', 'Account created successfully', 'Login to continue'); // Show a success toast
+      navigation.navigate(ROUTES.LOGIN); // Navigate to the login screen
     }
-
     if (signupError) {
+      // If there was an error creating the account
       ShowToast(
+        // Show a toast with the error message
         'error',
         'Oops, Error creating account. Try again.',
         'Password requires 1 upper, 1 number, 1 special character'
       );
     }
-  }, [accountCreated, signupError]);
+    if (serverError) {
+      // If there was a server error
+      // If there was a server error
+      ShowToast('error', 'Oops, Server error. Try again.', 'Server error');
+    }
+  }, [accountCreated, signupError]); // Add the accountCreated and signupError states to the useEffect hook
 
   return (
     <View className='w-full h-full bg-white pt-10 flex flex-col my-4 items-center'>
