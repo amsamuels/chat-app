@@ -8,7 +8,12 @@ import {
 } from 'react-native';
 import { useState, useEffect, useRef } from 'react';
 import { ROUTES } from '../../constants';
-import { SendChatMessage, GetChatdetails, DeleteMessage } from '../../apiCalls';
+import {
+  SendChatMessage,
+  GetChatdetails,
+  DeleteMessage,
+  EditMessage,
+} from '../../apiCalls';
 import { Ionicons } from '@expo/vector-icons';
 import { formatDuration } from '../../constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -59,9 +64,33 @@ const ChatSceen = (props) => {
     }
   };
 
-  const handleEdit = async (message_id) => {
-    console.log(message_id);
+  const [selectedMessageId, setSelectedMessageId] = useState(null);
+  const [editedMessage, setEditedMessage] = useState('');
+  const handleEdit = (message_id) => {
+    setSelectedMessageId(message_id);
+    const messageToEdit = messages.find(
+      (message) => message.message_id === message_id
+    );
+    setEditedMessage(messageToEdit.message);
   };
+
+  const handleUpdate = async (message_id) => {
+    try {
+      const messageData = { message: editedMessage };
+      const response = await EditMessage(
+        chat_id,
+        message_id,
+        messageData,
+        setSuccessfullySentMessage,
+        setErrorSendingMesaage
+      );
+      setSelectedMessageId(null);
+      getChatMessages();
+    } catch (error) {
+      // Handle the error
+    }
+  };
+
   const handleDelete = async (message_id) => {
     try {
       setDeleteMessageSuccess(false);
@@ -89,38 +118,67 @@ const ChatSceen = (props) => {
   const { name, messages } = JSON.parse(JSON.stringify(chatMessages));
   const renderItem = ({ item }) => {
     if (item.author.user_id == userId) {
-      return (
-        <View className='items-end'>
-          <View className='border rounded w-52 bg-sky-400 px-2 py-2 mx-2 my-2'>
-            <View className='flex flex-row justify-between'>
-              <Text className='text-base font-semibold  overflow-hidden'>
-                {item.author.first_name}: {item.message}
-              </Text>
-              <Text>{formatDuration(item.timestamp)}</Text>
-            </View>
-            <View className='relative inline-block text-left'>
-              <>
+      if (selectedMessageId === item.message_id) {
+        console.log('selectedMessageId', selectedMessageId);
+        return (
+          // render edit modal
+          <View className=' inset-0  bg-opacity-50'>
+            <View className='relative bg-white mx-auto w-80 my-10 p-4 rounded-lg'>
+              <TextInput
+                value={editedMessage}
+                onChangeText={setEditedMessage}
+                className='border-b pb-1 mb-4 w-full'
+              />
+              <View className='flex justify-end'>
                 <TouchableOpacity
                   onPress={() => {
-                    handleDelete(item.message_id);
+                    // call function to update message in data source
+                    handleUpdate(selectedMessageId);
                   }}
+                  className='bg-blue-500 px-4 py-2 rounded-md text-white'
                 >
-                  <Text>Delete</Text>
+                  <Text>Save</Text>
                 </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => {
-                    handleEdit(item.message_id);
-                  }}
-                >
-                  <Text>Edit</Text>
-                </TouchableOpacity>
-              </>
+              </View>
             </View>
           </View>
-        </View>
-      );
+        );
+      } else {
+        return (
+          // render message with Edit/Delete buttons
+          <View className='items-end'>
+            <View className='border rounded w-52 bg-sky-400 px-2 py-2 mx-2 my-2'>
+              <View className='flex flex-row justify-between'>
+                <Text className='text-base font-semibold  overflow-hidden'>
+                  {item.author.first_name}: {item.message}
+                </Text>
+                <Text>{formatDuration(item.timestamp)}</Text>
+              </View>
+              <View className='relative inline-block text-left'>
+                <>
+                  <TouchableOpacity
+                    onPress={() => {
+                      handleDelete(item.message_id);
+                    }}
+                  >
+                    <Text>Delete</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => {
+                      handleEdit(item.message_id);
+                    }}
+                  >
+                    <Text>Edit</Text>
+                  </TouchableOpacity>
+                </>
+              </View>
+            </View>
+          </View>
+        );
+      }
     } else {
       return (
+        // render message without Edit/Delete buttons
         <View className='border rounded w-52 bg-slate-400 px-2 py-2 mx-2 my-2'>
           <View className='flex flex-row justify-between'>
             <Text className='text-base font-semibold  overflow-hidden'>
