@@ -81,7 +81,9 @@ const Settings = (props) => {
             </Text>
           </View>
         </View>
-        <View className={'flex flex-col space-y-4 py-4 justify-center'}>
+        <View
+          className={'flex flex-col space-y-4 py-4 items-center justify-center'}
+        >
           <TouchableOpacity
             activeOpacity={0.8}
             className={

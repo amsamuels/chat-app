@@ -14,6 +14,7 @@ import {
   DeleteMessage,
   EditMessage,
 } from '../../apiCalls';
+import * as z from 'zod';
 import { Ionicons } from '@expo/vector-icons';
 import { formatDuration } from '../../constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -30,10 +31,13 @@ const ChatSceen = (props) => {
   const [DeleteMessageError, setDeleteMessageError] = useState(false); // this is to check if there was an error deleting the message
   const [chatMessages, setChatMessages] = useState([]);
   const chat_id = route.params.chat_id;
+  const messageSchema = z.string().min(1).max(1000);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleSendMessage = async () => {
     try {
-      const messageData = { message: sendMessages };
+      Keyboard.dismiss();
+      const messageData = { message: messageSchema.parse(sendMessages) };
       const response = await SendChatMessage(
         messageData,
         chat_id,
@@ -41,10 +45,12 @@ const ChatSceen = (props) => {
         setErrorSendingMesaage
       );
       setSendMessages('');
+      setErrorMessage('');
       Keyboard.dismiss();
       getChatMessages();
     } catch (error) {
       // Handle the error
+      setErrorMessage(error.message);
     }
   };
 
@@ -155,8 +161,9 @@ const ChatSceen = (props) => {
                 <Text>{formatDuration(item.timestamp)}</Text>
               </View>
               <View className='relative inline-block text-left'>
-                <>
+                <View className='flex flex-row space-x-3'>
                   <TouchableOpacity
+                    className='border rounded bg-sky-400 px-2 py-2 mx-2 my-2'
                     onPress={() => {
                       handleDelete(item.message_id);
                     }}
@@ -164,13 +171,14 @@ const ChatSceen = (props) => {
                     <Text>Delete</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
+                    className='border rounded bg-sky-400 px-2 py-2 mx-2 my-2'
                     onPress={() => {
                       handleEdit(item.message_id);
                     }}
                   >
                     <Text>Edit</Text>
                   </TouchableOpacity>
-                </>
+                </View>
               </View>
             </View>
           </View>
@@ -241,6 +249,11 @@ const ChatSceen = (props) => {
         />
       </View>
       <View className='flex p-2'>
+        {errorMessage ? (
+          <Text className='text-red-500 p-1 text-center'>
+            Please Enter Your message
+          </Text>
+        ) : null}
         <View className=' inline-flex flex-row  bg-gray-300/50 rounded-lg '>
           <TextInput
             onChangeText={(text) => setSendMessages(text)}
@@ -250,6 +263,7 @@ const ChatSceen = (props) => {
             }
             placeholder='Your Message...'
           />
+
           <TouchableOpacity
             onPress={handleSendMessage}
             className={' top-0 right-0 p-3'}
