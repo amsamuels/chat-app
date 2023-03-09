@@ -36,7 +36,14 @@ const Main = (props) => {
     }
     getChats();
     getUser();
-  }, []);
+    const unsubscribe = navigation.addListener('focus', () => {
+      // Call the functions that fetch data again to update the state
+      getChats();
+      getUser();
+    });
+
+    return unsubscribe;
+  }, [navigation]);
   return (
     <View className={'w-full h-full bg-white flex flex-col p-4'}>
       <View className={'flex flex-row items-center justify-between '}>

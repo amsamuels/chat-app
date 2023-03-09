@@ -6,7 +6,7 @@ import {
   FlatList,
   Keyboard,
 } from 'react-native';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { ROUTES } from '../../constants';
 import {
   SendChatMessage,
@@ -33,6 +33,7 @@ const ChatSceen = (props) => {
   const chat_id = route.params.chat_id;
   const messageSchema = z.string().min(1).max(1000);
   const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage2, setErrorMessage2] = useState('');
 
   const handleSendMessage = async () => {
     try {
@@ -82,7 +83,7 @@ const ChatSceen = (props) => {
 
   const handleUpdate = async (message_id) => {
     try {
-      const messageData = { message: editedMessage };
+      const messageData = { message: messageSchema.parse(editedMessage) };
       const response = await EditMessage(
         chat_id,
         message_id,
@@ -90,10 +91,12 @@ const ChatSceen = (props) => {
         setSuccessfullySentMessage,
         setErrorSendingMesaage
       );
+      setErrorMessage2('');
       setSelectedMessageId(null);
       getChatMessages();
     } catch (error) {
       // Handle the error
+      setErrorMessage2(error.message);
     }
   };
 
@@ -116,8 +119,16 @@ const ChatSceen = (props) => {
 
   useEffect(() => {
     const getUserId = async () => {
-      const id = await AsyncStorage.getItem('@id');
-      setUserId(JSON.parse(id));
+      try {
+        const id = await AsyncStorage.getItem('@id');
+        setUserId(JSON.parse(id));
+      } catch (error) {
+        // Handle the error
+        console.log('Could not retrive user Id ', error);
+        await AsyncStorage.removeItem('@id');
+        await AsyncStorage.removeItem('@token');
+        navigation.navigate(ROUTES.LOGIN);
+      }
     };
     getUserId();
   }, []);
@@ -125,7 +136,6 @@ const ChatSceen = (props) => {
   const renderItem = ({ item }) => {
     if (item.author.user_id == userId) {
       if (selectedMessageId === item.message_id) {
-        console.log('selectedMessageId', selectedMessageId);
         return (
           // render edit modal
           <View className=' inset-0  bg-opacity-50'>
@@ -135,6 +145,11 @@ const ChatSceen = (props) => {
                 onChangeText={setEditedMessage}
                 className='border-b pb-1 mb-4 w-full'
               />
+              {errorMessage2 ? (
+                <Text className='text-red-500 p-1 text-center'>
+                  Cannot be empty
+                </Text>
+              ) : null}
               <View className='flex justify-end'>
                 <TouchableOpacity
                   onPress={() => {

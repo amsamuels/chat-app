@@ -17,6 +17,8 @@ const SignUp = (props) => {
   const onSubmit = async (data) => {
     try {
       Keyboard.dismiss();
+      setAccountCreated(false);
+      setSignupError(false);
       await CreateUser(data, setAccountCreated, setSignupError);
     } catch (error) {
       console.error('Failed to create user:', error);

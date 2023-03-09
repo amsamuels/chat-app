@@ -36,7 +36,8 @@ const Login = (props) => {
 
   const onSubmit = async (data) => {
     try {
-      console.log(data);
+      setIcorrectLogin(false);
+      setLoginError(false);
       await LoginUser(data, setLoggedIn, setIcorrectLogin, setLoginError);
     } catch (error) {
       console.error('Failed to Login user:', error);
