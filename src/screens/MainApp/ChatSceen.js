@@ -150,7 +150,7 @@ const ChatSceen = (props) => {
                   Cannot be empty
                 </Text>
               ) : null}
-              <View className='flex justify-end'>
+              <View className='flex flex-row space-x-3 justify-end'>
                 <TouchableOpacity
                   onPress={() => {
                     // call function to update message in data source
@@ -159,6 +159,15 @@ const ChatSceen = (props) => {
                   className='bg-blue-500 px-4 py-2 rounded-md text-white'
                 >
                   <Text>Save</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    // call function to update message in data source
+                    setSelectedMessageId(null);
+                  }}
+                  className='bg-blue-500 px-4 py-2 rounded-md text-white'
+                >
+                  <Text>Cancel</Text>
                 </TouchableOpacity>
               </View>
             </View>

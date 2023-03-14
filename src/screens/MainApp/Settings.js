@@ -26,6 +26,8 @@ const Settings = (props) => {
   async function getUser() {
     setErrorGettingUser(false);
     setGetUserSuccess(true);
+    setServerError(false);
+    setUnauthorized(false);
     const getUser = await GetUser(
       setGetUserSuccess,
       setUnauthorized,

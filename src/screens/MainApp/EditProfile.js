@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   View,
   Text,
@@ -14,40 +13,89 @@ import { ShowToast, FormSchema, GetUser, UpdateUser } from '../../apiCalls';
 import { ROUTES } from '../../constants';
 
 const EditProfile = (props) => {
-  const { navigation } = props;
-  const [profile, setProfile] = useState(null);
-  const [accountUpdated, setAccountUpdated] = useState(false);
-  const [updateError, setUpdateError] = useState(false);
+  const { navigation } = props; // Destructure the navigation prop
+  const [profile, setProfile] = useState(null); // Set the profile state
+  const [accountUpdated, setAccountUpdated] = useState(false); // Set the account updated state
+  const [updateError, setUpdateError] = useState(false); // Set the update error state
+  const [forbidden, setForbidden] = useState(false); // Set the forbidden state
+  const [notFound, setNotFound] = useState(false); // Set the not found state
+  const [errorGettingUser, setErrorGettingUser] = useState(false); // Set the error getting user state
+  const [getUserSuccess, setGetUserSuccess] = useState(false); // Set the get user success state
+  const [Unauthorized, setUnauthorized] = useState(false); // Set the unauthorized state
+  const [badRequest, setBadRequest] = useState(false); // Set the bad request state
+  const [ServerError, setServerError] = useState(false); // Set the server error state
   const { ...methods } = useForm({
     resolver: zodResolver(FormSchema),
   });
   const onSubmit = async (data) => {
     try {
+      setAccountUpdated(false);
+      setBadRequest(false);
+      setForbidden(false);
+      setNotFound(false);
+      setServerError(false);
+      setUnauthorized(false);
+      setUpdateError(false);
       Keyboard.dismiss();
-      await UpdateUser(data, setAccountUpdated, setUpdateError);
+      await UpdateUser(
+        data,
+        setAccountUpdated,
+        setUnauthorized,
+        setForbidden,
+        setBadRequest,
+        setServerError,
+        setNotFound,
+        setUpdateError
+      );
     } catch (error) {
       console.error('Failed to create user:', error);
     }
   };
+  async function getUser() {
+    setErrorGettingUser(false);
+    setGetUserSuccess(true);
+    setServerError(false);
+    setUnauthorized(false);
+    const getUser = await GetUser(
+      setGetUserSuccess,
+      setUnauthorized,
+      setErrorGettingUser,
+      setServerError
+    );
+    setProfile(getUser);
+  }
+
   useEffect(() => {
-    async function getUser() {
-      const getUser = await GetUser();
-      console.log(getUser);
-      setProfile(getUser);
-    }
     getUser();
     if (accountUpdated) {
       ShowToast('success', 'Account updated successfully');
     }
-
-    if (updateError) {
-      ShowToast(
-        'error',
-        'Oops, Error updating account. Try again.',
-        'Password requires 1 upper, 1 number, 1 special character'
-      );
+    if (badRequest) {
+      ShowToast('error', 'Wrong Password');
     }
-  }, [accountUpdated, updateError]);
+    if (Unauthorized) {
+      navigation.navigate(ROUTES.LOGIN);
+    }
+    if (forbidden) {
+      navigation.navigate(ROUTES.LOGIN);
+    }
+    if (notFound) {
+      navigation.navigate(ROUTES.LOGIN);
+    }
+    if (ServerError) {
+      ShowToast('error', 'Server error');
+    }
+    if (errorGettingUser) {
+      ShowToast('error', 'Error getting user');
+    }
+  }, [
+    accountUpdated,
+    updateError,
+    badRequest,
+    forbidden,
+    notFound,
+    errorGettingUser,
+  ]);
 
   return (
     <View className={'w-full h-full bg-white flex flex-col'}>
