@@ -131,6 +131,15 @@ const ChatSceen = (props) => {
       }
     };
     getUserId();
+    if (SuccessfullyGotMessages) {
+      getChatMessages();
+    }
+    if (successfullySentMessage) {
+      getChatMessages();
+    }
+    if (DeleteMessageSuccess) {
+      getChatMessages();
+    }
   }, []);
   const { name, messages } = JSON.parse(JSON.stringify(chatMessages));
   const renderItem = ({ item }) => {

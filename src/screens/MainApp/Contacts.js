@@ -17,12 +17,18 @@ import { AntDesign } from '@expo/vector-icons';
 import { Entypo } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
 import { ROUTES } from '../../constants';
+import * as z from 'zod';
+
 const Contacts = (props) => {
   const { navigation } = props;
   const [searchQuery, setSearchQuery] = useState('');
   const [contacts, setContacts] = useState([]);
-  const [contactBlocked, setContactBlocked] = useState(false);
-  const [errorBlocking, setErrorBlocking] = useState(false);
+  const [contactBlocked, setContactBlocked] = useState(false); // State to check if contact is blocked
+  const [errorBlocking, setErrorBlocking] = useState(false); // State to check if there is an error adding a contact
+  const [forbidden, setForbidden] = useState(false); // Set the forbidden state
+  const [unauthorized, setUnauthorized] = useState(false); // Set the unauthorized state
+  const [errorMessage, setErrorMessage] = useState(''); // State to store the error message
+  const textSchema = z.string().min(1).max(1000);
 
   const getContacts = useCallback(async () => {
     const contactsList = await GetContacts();
@@ -31,11 +37,18 @@ const Contacts = (props) => {
   const handleSearch = async () => {
     try {
       const search_in = 'contacts';
-      const response = await SearchUser(searchQuery, search_in);
+      const response = await SearchUser(
+        textSchema.parse(searchQuery),
+        search_in,
+        setForbidden,
+        setUnauthorized
+      );
+      setErrorMessage('');
       setContacts(response);
       // Do something with the response data
     } catch (error) {
       // Handle the error
+      setErrorMessage(error.message);
     }
   };
 
@@ -85,6 +98,11 @@ const Contacts = (props) => {
           </TouchableOpacity>
         </View>
         <View className='flex p-4'>
+          {errorMessage ? (
+            <Text className='text-red-500 p-1 text-center'>
+              Cannot be empty
+            </Text>
+          ) : null}
           <View className=' inline-flex flex-row  bg-gray-300/50 rounded-lg '>
             <TextInput
               onChangeText={(text) => setSearchQuery(text)}

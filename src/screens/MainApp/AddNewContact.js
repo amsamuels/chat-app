@@ -21,14 +21,17 @@ const AddNewContact = (props) => {
   const [contactSearchResult, setContactSearchResult] = useState([]); // State to store the search result
   const searchSchema = z.string().min(1).max(1000); // Schema to validate the search query
   const [errorMessage, setErrorMessage] = useState(''); // State to store the error message
-
+  const [forbidden, setForbidden] = useState(false); // Set the forbidden state
+  const [unauthorized, setUnauthorized] = useState(false); // Set the unauthorized state
   const handleSearch = async () => {
     try {
       const search_in = 'all'; // Search in all fields
       const response = await SearchUser(
         // Call the search user api
         searchSchema.parse(searchQuery), // Parse the search query
-        search_in
+        search_in,
+        setForbidden,
+        setUnauthorized
       );
       setContactSearchResult(response); // Set the search result
       // Do something with the response data
@@ -54,6 +57,16 @@ const AddNewContact = (props) => {
       // Handle the error
     }
   });
+  useEffect(() => {
+    if (forbidden) {
+      // If forbidden is true
+      navigation.navigate(ROUTES.LOGIN); // Navigate to the login screen
+    }
+    if (unauthorized) {
+      // If unauthorized is true
+      navigation.navigate(ROUTES.LOGIN); // Navigate to the login screen
+    }
+  }, []);
   return (
     <>
       <View className={'w-full h-full bg-white flex flex-col p-4'}>

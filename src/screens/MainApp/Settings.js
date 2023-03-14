@@ -22,6 +22,8 @@ const Settings = (props) => {
   const [getUserSuccess, setGetUserSuccess] = useState(false);
   const [Unauthorized, setUnauthorized] = useState(false);
   const [ServerError, setServerError] = useState(false);
+  const [forbidden, setForbidden] = useState(false);
+  const [notFound, setNotFound] = useState(false);
 
   async function getUser() {
     setErrorGettingUser(false);
@@ -37,10 +39,31 @@ const Settings = (props) => {
     setProfile(getUser);
   }
   async function GetPhoto() {
-    const getPhoto = await getProfilePhoto();
+    const getPhoto = await getProfilePhoto(
+      setUnauthorized,
+      setForbidden,
+      setServerError
+    );
     setProfilePhoto(getPhoto);
     getUser();
   }
+  const getImg = async () => {
+    // Function to get the image
+    const img = await pickImage(); // Call the pickImage function from the apiCalls
+    if (img) {
+      // If there is an image
+      let newImg = { img }; // Create a new object with the image
+      await UploadUserPhoto(
+        newImg,
+        setUnauthorized,
+        setForbidden,
+        setServerError,
+        setNotFound
+      ); // Call the function to upload the photo
+      GetPhoto(); // Call the function to get the photo
+    }
+    GetPhoto(); // Call the function to get the photo
+  };
   const handleLogout = async () => {
     const res = await LogOut();
 
@@ -51,10 +74,20 @@ const Settings = (props) => {
     getUser();
     GetPhoto();
     if (errorGettingUser) {
-      navigation.navigate(ROUTES.LOGIN);
+      // If there is an error getting the user
+      navigation.navigate(ROUTES.LOGIN); // Navigate to the login screen
     }
     if (Unauthorized) {
-      navigation.navigate(ROUTES.LOGIN);
+      // If the user is unauthorized
+      navigation.navigate(ROUTES.LOGIN); // Navigate to the login screen
+    }
+    if (forbidden) {
+      // If the user is forbidden
+      navigation.navigate(ROUTES.LOGIN); // Navigate to the login screen
+    }
+    if (notFound) {
+      // If the user is not found
+      ShowToast('error', 'Not found'); // Show a toast
     }
 
     if (ServerError) {
@@ -67,18 +100,8 @@ const Settings = (props) => {
       GetPhoto();
     });
 
-    return unsubscribe;
-  }, [navigation]);
-
-  const getImg = async () => {
-    const img = await pickImage();
-    if (img) {
-      let newImg = { img };
-      await UploadUserPhoto(newImg);
-      GetPhoto();
-    }
-    GetPhoto();
-  };
+    return unsubscribe; // Return the unsubscribe function to clean up the event listener
+  }, [navigation]); // Add the navigation prop to the useEffect dependencies
 
   return (
     <ScrollView>

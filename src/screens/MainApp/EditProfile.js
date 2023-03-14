@@ -68,25 +68,32 @@ const EditProfile = (props) => {
   useEffect(() => {
     getUser();
     if (accountUpdated) {
-      ShowToast('success', 'Account updated successfully');
+      // If the account is updated
+      ShowToast('success', 'Account updated successfully'); // Show a success toast
     }
     if (badRequest) {
-      ShowToast('error', 'Wrong Password');
+      // If the user is unauthorized
+      ShowToast('error', 'Wrong Password'); // Show an error toast
     }
     if (Unauthorized) {
-      navigation.navigate(ROUTES.LOGIN);
+      // If the user is unauthorized
+      navigation.navigate(ROUTES.LOGIN); // Navigate to the login screen
     }
     if (forbidden) {
-      navigation.navigate(ROUTES.LOGIN);
+      // If the user is forbidden
+      navigation.navigate(ROUTES.LOGIN); // Navigate to the login screen
     }
     if (notFound) {
-      navigation.navigate(ROUTES.LOGIN);
+      // If the user is not found
+      navigation.navigate(ROUTES.LOGIN); // Navigate to the login screen
     }
     if (ServerError) {
-      ShowToast('error', 'Server error');
+      // If there is a server error
+      ShowToast('error', 'Server error'); // Show an error toast
     }
     if (errorGettingUser) {
-      ShowToast('error', 'Error getting user');
+      // If there is an error getting the user
+      ShowToast('error', 'Error getting user'); // Show an error toast
     }
   }, [
     accountUpdated,
@@ -95,6 +102,8 @@ const EditProfile = (props) => {
     forbidden,
     notFound,
     errorGettingUser,
+    ServerError,
+    Unauthorized,
   ]);
 
   return (
