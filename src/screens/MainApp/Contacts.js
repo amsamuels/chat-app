@@ -11,6 +11,7 @@ import {
   GetContacts,
   deleteContact,
   BlockContact,
+  ShowToast,
 } from '../../apiCalls';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
@@ -28,10 +29,16 @@ const Contacts = (props) => {
   const [forbidden, setForbidden] = useState(false); // Set the forbidden state
   const [unauthorized, setUnauthorized] = useState(false); // Set the unauthorized state
   const [errorMessage, setErrorMessage] = useState(''); // State to store the error message
+  const [serverError, setServerError] = useState(false); // Set the server error state
+  const [yourself, setYourself] = useState(false); // Set the server error state
   const textSchema = z.string().min(1).max(1000);
 
   const getContacts = useCallback(async () => {
-    const contactsList = await GetContacts();
+    const contactsList = await GetContacts(
+      unauthorized,
+      setForbidden,
+      setServerError
+    );
     setContacts(contactsList);
   });
   const handleSearch = async () => {
@@ -54,7 +61,13 @@ const Contacts = (props) => {
 
   const handleDeleteContact = useCallback(async (id) => {
     try {
-      await deleteContact(id);
+      await deleteContact(
+        id,
+        setForbidden,
+        setUnauthorized,
+        setServerError,
+        setYourself
+      );
       getContacts();
     } catch (error) {
       // Handle the error
@@ -63,7 +76,15 @@ const Contacts = (props) => {
 
   const handleBlockContact = useCallback(async (id) => {
     try {
-      await BlockContact(id, setContactBlocked, setErrorBlocking);
+      await BlockContact(
+        id,
+        setContactBlocked,
+        setErrorBlocking,
+        setForbidden,
+        setUnauthorized,
+        setServerError,
+        setYourself
+      );
       getContacts();
     } catch (error) {
       // Handle the error
@@ -76,6 +97,31 @@ const Contacts = (props) => {
       // Call the functions that fetch data again to update the state
       getContacts();
     });
+
+    if (contactBlocked) {
+      ShowToast('success', 'Contact Blocked');
+      setContactBlocked(false);
+    }
+    if (errorBlocking) {
+      ShowToast('error', 'Error Blocking Contact');
+      setErrorBlocking(false);
+    }
+    if (forbidden) {
+      navigation.navigate(ROUTES.LOGIN);
+      setForbidden(false);
+    }
+    if (unauthorized) {
+      navigation.navigate(ROUTES.LOGIN);
+      setUnauthorized(false);
+    }
+    if (serverError) {
+      ShowToast('error', 'Server Error');
+      setServerError(false);
+    }
+    if (yourself) {
+      ShowToast('error', 'You cannot block yourself');
+      setYoucannotblockyourself(false);
+    }
 
     return unsubscribe;
   }, [navigation]);

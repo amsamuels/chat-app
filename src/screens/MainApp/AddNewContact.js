@@ -23,6 +23,8 @@ const AddNewContact = (props) => {
   const [errorMessage, setErrorMessage] = useState(''); // State to store the error message
   const [forbidden, setForbidden] = useState(false); // Set the forbidden state
   const [unauthorized, setUnauthorized] = useState(false); // Set the unauthorized state
+  const [cannoAddyourself, setCannoAddyourself] = useState(false); // Set the unauthorized state
+  const [serverError, setServerError] = useState(false); // Set the server error state
   const handleSearch = async () => {
     try {
       const search_in = 'all'; // Search in all fields
@@ -45,7 +47,15 @@ const AddNewContact = (props) => {
     try {
       setContactAdded(false); // Set contact added to false
       setAddError(false); // Set add error to false
-      await AddContact(id, setContactAdded, setAddError); // Call the add contact api
+      await AddContact(
+        id,
+        setContactAdded,
+        setAddError,
+        setForbidden,
+        setUnauthorized,
+        setCannoAddyourself,
+        setServerError
+      ); // Call the add contact api
       setContactAdded(true); // Set contact added to true
       setTimeout(() => {
         ShowToast('success', 'Contact Added Successfully'); // Show a toast
@@ -66,7 +76,15 @@ const AddNewContact = (props) => {
       // If unauthorized is true
       navigation.navigate(ROUTES.LOGIN); // Navigate to the login screen
     }
-  }, []);
+    if (cannoAddyourself) {
+      // If unauthorized is true
+      ShowToast('error', 'Cannot add yourself'); // Show a toast
+    }
+    if (serverError) {
+      // If unauthorized is true
+      ShowToast('error', 'Server Error'); // Show a toast
+    }
+  }, [forbidden, unauthorized, cannoAddyourself, serverError]);
   return (
     <>
       <View className={'w-full h-full bg-white flex flex-col p-4'}>

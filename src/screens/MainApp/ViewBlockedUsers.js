@@ -6,33 +6,59 @@ import { Feather } from '@expo/vector-icons';
 import { ShowToast } from '../../apiCalls';
 
 const ViewBlockedUsers = (props) => {
-  const { navigation } = props;
-  const [blockedContacts, setBlockedContacts] = useState([]);
-  const [SuccessfullyUnblocked, setSuccessfullyUnblocked] = useState(false);
-  const [errorBlocking, setErrorBlocking] = useState(false);
+  const { navigation } = props; // Destructure the navigation prop
+  const [blockedContacts, setBlockedContacts] = useState([]); // Set the blocked contacts state
+  const [SuccessfullyUnblocked, setSuccessfullyUnblocked] = useState(false); // Set the successfully unblocked state
+  const [errorBlocking, setErrorBlocking] = useState(false); // Set the error blocking state
+  const [forbidden, setForbidden] = useState(false); // Set the forbidden state
+  const [unauthorized, setUnauthorized] = useState(false); // Set the unauthorized state
+  const [serverError, setServerError] = useState(false); // Set the server error state
 
   const getBlockedContacts = async () => {
-    const getBlockedContacts = await GetBlockedContacts();
-    setBlockedContacts(getBlockedContacts);
-    console.log(getBlockedContacts);
+    // Function to get the blocked contacts
+    const getBlockedContacts = await GetBlockedContacts(
+      // Call the get blocked contacts api
+      setServerError,
+      setUnauthorized
+    );
+    setBlockedContacts(getBlockedContacts); // Set the blocked contacts state
   };
   const handleUnblockContact = async (id) => {
+    // Function to unblock a contact
     const unblockContact = await UnblockContact(
+      // Call the unblock contact api
       id,
       setSuccessfullyUnblocked,
-      setErrorBlocking
+      setErrorBlocking,
+      setForbidden,
+      setUnauthorized,
+      setServerError
     );
-    getBlockedContacts();
+    getBlockedContacts(); // Get the blocked contacts
   };
 
   useEffect(() => {
-    getBlockedContacts();
+    // Use effect to get the blocked contacts
+    getBlockedContacts(); // Get the blocked contacts
     if (SuccessfullyUnblocked) {
-      const toast = ShowToast('success', 'Successfully Unblocked Contact');
-      setTimeout(() => {
-        // Hide toast after 2 seconds
-        toast?.hide();
-      }, 2000);
+      // If successfully unblocked
+      ShowToast('success', 'Successfully Unblocked Contact'); // Show a toast
+    }
+    if (errorBlocking) {
+      // If there is an error blocking
+      ShowToast('error', 'Error Blocking Contact'); // Show a toast
+    }
+    if (serverError) {
+      // If there is a server error
+      ShowToast('error', 'Server Error'); // Show a toast
+    }
+    if (unauthorized) {
+      // If unauthorized
+      navigation.navigate(ROUTES.LOGIN); // Navigate to the login screen
+    }
+    if (forbidden) {
+      // If forbidden
+      navigation.navigate(ROUTES.LOGIN); // Navigate to the login screen
     }
   }, [SuccessfullyUnblocked]);
 
