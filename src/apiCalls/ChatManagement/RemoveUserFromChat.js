@@ -4,9 +4,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const RemoveUserFromChat = async (
   chat_id,
   user_id,
-  setChatUserAdded,
-  setUserInChat,
-  setErrorAddingUser
+  setSuccessful,
+  setErrorAddingUser,
+  setUnauthorized,
+  setForbidden,
+  setNotFound,
+  setServerError
 ) => {
   try {
     const token = await AsyncStorage.getItem('@token');
@@ -20,10 +23,19 @@ const RemoveUserFromChat = async (
     });
     if (res?.status === 200) {
       console.log('Remove User from Chat: Successfully removed user');
-      setChatUserAdded(true);
+      setSuccessful(true);
     } else if (res?.status === 401) {
       console.log('Remove User from Chat: Unauthorized');
-      setErrorAddingUser(true);
+      setUnauthorized(true);
+    } else if (res?.status === 403) {
+      console.log('Remove User from Chat: Forbidden');
+      setForbidden(true);
+    } else if (res?.status === 404) {
+      console.log('Remove User from Chat: User not in chat');
+      setNotFound(true);
+    } else if (res?.status === 500) {
+      console.log('Remove User from Chat: Server Error');
+      setServerError(true);
     }
   } catch (error) {
     console.error('Remove User from Chat: Unauthorized', error);

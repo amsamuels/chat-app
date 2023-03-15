@@ -12,9 +12,12 @@ import {
   GetChatdetails,
   RemoveUserFromChat,
   UpdateChatDetails,
+  ShowToast,
 } from '../../apiCalls';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { ChatMember, ContactComp } from '../../components';
+import { ROUTES } from '../../constants';
+import * as z from 'zod';
 
 const ChatSettings = (props) => {
   const { navigation } = props;
@@ -24,49 +27,72 @@ const ChatSettings = (props) => {
   const [chatDetails, setChatDetails] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [UpdateChatName, setUpdateChatName] = useState('');
-  const [chatUserAdded, setChatUserAdded] = useState(false);
-  const [errorAddingUser, setErrorAddingUser] = useState(false);
-  const [SuccessfullyGotMessages, setSuccessfullyGotMessages] = useState(false);
-  const [errorGettingMessages, setErrorGettingMessages] = useState(false);
-  const [userInChat, setUserInChat] = useState(false);
-  const [successfullyUpdatedChat, setSuccessfullyUpdatedChat] = useState(false);
-  const [errorUpdatingChat, setErrorUpdatingChat] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(''); // State to store the error message
+  const [errorMessage2, setErrorMessage2] = useState(''); // State to store the error message
+  const [error, setError] = useState(false);
+  const [successful, setSuccessful] = useState(false);
+  const [unauthorized, setUnauthorized] = useState(false);
+  const [forbidden, setForbidden] = useState(false);
+  const [notFound, setNotFound] = useState(false);
+  const [serverError, setServerError] = useState(false);
+  const chatSchema = z.string().min(1).max(1000); // Schema to validate the search query
 
   const handleSearch = async () => {
     try {
       const search_in = 'contacts';
-      const response = await SearchUser(searchQuery, search_in);
+      const response = await SearchUser(
+        chatSchema.parse(searchQuery),
+        search_in
+      );
       setContacts(response);
       // Do something with the response data
     } catch (error) {
       // Handle the error
+      setErrorMessage(error.message); // Set the error message
     }
   };
   const handleUpdateChatDetails = async () => {
     try {
-      const data = { name: UpdateChatName };
-      const response = await UpdateChatDetails(
+      const data = { name: chatSchema.parse(UpdateChatName) };
+      setSuccessful(false);
+      setError(false);
+      setUnauthorized(false);
+      setForbidden(false);
+      setNotFound(false);
+      setServerError(false);
+      await UpdateChatDetails(
         chat_id,
         data,
-        setSuccessfullyUpdatedChat,
-        setErrorUpdatingChat
+        setSuccessful,
+        setError,
+        setUnauthorized,
+        setForbidden,
+        setNotFound,
+        setServerError
       );
       getChatDetails();
     } catch (error) {
       // Handle the error
+      setErrorMessage2(error.message); // Set the error message
     }
   };
   const handleAddUserToChat = useCallback(async (chat_id, user_id) => {
     try {
-      setChatUserAdded(false);
-      setUserInChat(false);
-      setErrorAddingUser(false);
-      const add = await AddUserToChat(
+      setSuccessful(false);
+      setError(false);
+      setUnauthorized(false);
+      setForbidden(false);
+      setNotFound(false);
+      setServerError(false);
+      await AddUserToChat(
         chat_id,
         user_id,
-        setChatUserAdded,
-        setUserInChat,
-        setErrorAddingUser
+        setSuccessful,
+        setError,
+        setUnauthorized,
+        setForbidden,
+        setNotFound,
+        setServerError
       );
       getChatDetails();
     } catch (error) {
@@ -75,15 +101,17 @@ const ChatSettings = (props) => {
   });
   const handleRemoveChatUser = useCallback(async (chat_id, user_id) => {
     try {
-      setChatUserAdded(false);
-      setUserInChat(false);
-      setErrorAddingUser(false);
-      const remove = await RemoveUserFromChat(
+      setSuccessful(false);
+      setError(false);
+      await RemoveUserFromChat(
         chat_id,
         user_id,
-        setChatUserAdded,
-        setUserInChat,
-        setErrorAddingUser
+        setSuccessful,
+        setError,
+        setUnauthorized,
+        setForbidden,
+        setNotFound,
+        setServerError
       );
       getChatDetails();
     } catch (error) {
@@ -93,14 +121,14 @@ const ChatSettings = (props) => {
 
   const getChatDetails = async () => {
     try {
-      setSuccessfullyGotMessages(true);
-      setErrorGettingMessages(false);
       const response = await GetChatdetails(
         chat_id,
-        setSuccessfullyGotMessages,
-        setErrorGettingMessages
+        setError,
+        setUnauthorized,
+        setForbidden,
+        setNotFound,
+        setServerError
       );
-      console.log(response);
       setChatDetails(response);
     } catch (error) {
       // Handle the error
@@ -108,13 +136,25 @@ const ChatSettings = (props) => {
   };
   useEffect(() => {
     getChatDetails();
-    if (SuccessfullyGotMessages) {
-      console.log(chatMessages);
+    if (error) {
+      ShowToast('error', 'Request Error');
     }
-    if (errorGettingMessages) {
-      console.log('error');
+    if (successful) {
+      ShowToast('success', 'Request successful');
     }
-  }, []);
+    if (unauthorized) {
+      navigation.navigate(ROUTES.LOGIN); // Navigate to the login screen
+    }
+    if (forbidden) {
+      navigation.navigate(ROUTES.LOGIN); // Navigate to the login screen
+    }
+    if (notFound) {
+      ShowToast('error', 'Chat not found');
+    }
+    if (serverError) {
+      ShowToast('error', 'Server error');
+    }
+  }, [successful, unauthorized, error, forbidden, notFound, serverError]);
 
   return (
     <View className={'w-full h-full bg-white flex flex-col p-4'}>
@@ -126,7 +166,7 @@ const ChatSettings = (props) => {
           <Text className={'px-2 py-2 font-semibold  text-lg'}>Back</Text>
         </TouchableOpacity>
         <View>
-          <Text className={'px-2 py-2 font-semibold  text-lg'}>
+          <Text className={'px-2 py-2 font-semibold  text-center text-lg'}>
             Chat Settings
           </Text>
         </View>
@@ -145,6 +185,11 @@ const ChatSettings = (props) => {
         )}
         <View className={'flex flex-col'}>
           <View className={'py-3 space-y-4'}>
+            {errorMessage2 ? (
+              <Text className='text-red-500 p-1 text-center'>
+                Cannot be empty
+              </Text>
+            ) : null}
             <TextInput
               onChangeText={(text) => setUpdateChatName(text)}
               className={
@@ -167,6 +212,11 @@ const ChatSettings = (props) => {
         </View>
 
         <View className='flex p-4'>
+          {errorMessage ? (
+            <Text className='text-red-500 p-1 text-center'>
+              Cannot be empty
+            </Text>
+          ) : null}
           <View className=' inline-flex flex-row  bg-gray-300/50 rounded-lg '>
             <TextInput
               onChangeText={(text) => setSearchQuery(text)}
@@ -185,6 +235,13 @@ const ChatSettings = (props) => {
             </TouchableOpacity>
           </View>
         </View>
+        {error && (
+          <View className='flex flex-col items-center justify-center'>
+            <Text className='text-lg font-semibold text-center text-red-600 truncate'>
+              User already in chat
+            </Text>
+          </View>
+        )}
 
         <View className='max-w-md divide-y divide-gray-200'>
           {contacts.map((contact) => {
@@ -203,6 +260,7 @@ const ChatSettings = (props) => {
             Chat Members
           </Text>
         </View>
+
         <View>
           {chatDetails &&
             chatDetails.members.map((member) => {
