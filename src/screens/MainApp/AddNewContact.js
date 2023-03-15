@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import { useState, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { SearchUser, AddContact, ShowToast } from '../../apiCalls';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
@@ -43,7 +43,7 @@ const AddNewContact = (props) => {
     }
   };
 
-  const handleAddContact = useCallback(async (id) => {
+  const handleAddContact = async (id) => {
     try {
       setContactAdded(false); // Set contact added to false
       setAddError(false); // Set add error to false
@@ -66,7 +66,7 @@ const AddNewContact = (props) => {
       ShowToast('error', 'Error Adding Contact'); // Show a toast
       // Handle the error
     }
-  });
+  };
   useEffect(() => {
     if (forbidden) {
       // If forbidden is true

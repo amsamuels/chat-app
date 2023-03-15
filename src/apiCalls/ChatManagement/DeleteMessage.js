@@ -4,8 +4,12 @@ import { API_URL } from '@env';
 const DeleteMessage = async (
   chat_id,
   message_id,
-  setDeleteMessageSuccess,
-  setDeleteMessageError
+  setSuccessful,
+  setError,
+  setUnauthorized,
+  setForbidden,
+  setNotFound,
+  setServerError
 ) => {
   try {
     const token = await AsyncStorage.getItem('@token');
@@ -18,15 +22,24 @@ const DeleteMessage = async (
       },
     });
     if (res?.status === 200) {
-      setDeleteMessageSuccess(true);
       console.log('Delete Message: Successfully Deleted Message');
+      setSuccessful(true);
     } else if (res?.status === 401) {
-      setDeleteMessageError(true);
       console.log('Delete Message: Unauthorized');
+      setUnauthorized(true);
+    } else if (res?.status === 400) {
+      console.log('Delete Message: Bad Request');
+      setError(true);
+    } else if (res?.status === 404) {
+      console.log('Delete Message: Not Found');
+      setNotFound(true);
+    } else if (res?.status === 500) {
+      console.log('Delete Message: Internal Server Error');
+      setServerError(true);
     }
   } catch (error) {
     console.error('Delete Message Failed', error);
-    setDeleteMessageError(true);
+    setError(true);
     throw error;
   }
 };

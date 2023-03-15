@@ -33,14 +33,10 @@ const Contacts = (props) => {
   const [yourself, setYourself] = useState(false); // Set the server error state
   const textSchema = z.string().min(1).max(1000);
 
-  const getContacts = useCallback(async () => {
-    const contactsList = await GetContacts(
-      unauthorized,
-      setForbidden,
-      setServerError
-    );
+  const getContacts = async () => {
+    const contactsList = await GetContacts(setUnauthorized, setServerError);
     setContacts(contactsList);
-  });
+  };
   const handleSearch = async () => {
     try {
       const search_in = 'contacts';
@@ -92,7 +88,6 @@ const Contacts = (props) => {
   });
 
   useEffect(() => {
-    getContacts();
     const unsubscribe = navigation.addListener('focus', () => {
       // Call the functions that fetch data again to update the state
       getContacts();
@@ -124,7 +119,16 @@ const Contacts = (props) => {
     }
 
     return unsubscribe;
-  }, [navigation]);
+  }, [
+    contactBlocked,
+    errorBlocking,
+    forbidden,
+    getContacts,
+    navigation,
+    serverError,
+    unauthorized,
+    yourself,
+  ]);
 
   return (
     <>

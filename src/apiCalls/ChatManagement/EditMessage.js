@@ -5,8 +5,12 @@ const EditMessage = async (
   chat_id,
   message_id,
   data,
-  setAccountUpdated,
-  setUpdateError
+  setSuccessful,
+  setError,
+  setUnauthorized,
+  setForbidden,
+  setNotFound,
+  setServerError
 ) => {
   try {
     const token = await AsyncStorage.getItem('@token');
@@ -20,15 +24,24 @@ const EditMessage = async (
       body: JSON.stringify(data),
     });
     if (res?.status === 200) {
-      setAccountUpdated(true);
+      setSuccessful(true);
       console.log('Edit Message: Successfully Edited Message');
     } else if (res?.status === 401) {
-      setUpdateError(true);
       console.log('Failed to Edit Message: Unauthorized');
+      setUnauthorized(true);
+    } else if (res?.status === 400) {
+      console.log('Failed to Edit Message: Bad Request');
+      setError(true);
+    } else if (res?.status === 404) {
+      console.log('Failed to Edit Message: Not Found');
+      setNotFound(true);
+    } else if (res?.status === 500) {
+      console.log('Failed to Edit Message: Internal Server Error');
+      setServerError(true);
     }
   } catch (error) {
     console.error('Failed to Edit Message: Unauthorized', error);
-    setUpdateError(true);
+    setError(true);
     throw error;
   }
 };

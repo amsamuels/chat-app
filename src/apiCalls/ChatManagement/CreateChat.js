@@ -1,7 +1,13 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_URL } from '@env';
 
-const CreateChat = async (data, setChatCreated, setErrorCreatingChat) => {
+const CreateChat = async (
+  data,
+  setSuccessful,
+  setErrorCreatingChat,
+  setUnauthorized,
+  setServerError
+) => {
   try {
     console.log(JSON.stringify(data));
     const token = await AsyncStorage.getItem('@token');
@@ -16,10 +22,16 @@ const CreateChat = async (data, setChatCreated, setErrorCreatingChat) => {
     });
     if (res?.status === 201) {
       console.log('Start Chat: Successfully started chat');
-      setChatCreated(true);
+      setSuccessful(true);
+    } else if (res?.status === 400) {
+      console.log('Start Chat: Bad Request');
+      setErrorCreatingChat(true);
     } else if (res?.status === 401) {
       console.log('Start Chat: Unauthorized');
-      setErrorCreatingChat(true);
+      setUnauthorized(true);
+    } else if (res?.status === 500) {
+      console.log('Start Chat: Internal Server Error');
+      setServerError(true);
     }
   } catch (error) {
     console.error('Start Chat: Unauthorized', error);

@@ -1,27 +1,56 @@
 import { View, Text, TouchableOpacity } from 'react-native';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ROUTES } from '../../constants';
 import { useForm, FormProvider } from 'react-hook-form';
 import { TextInput } from '../../components';
-import { CreateChat } from '../../apiCalls';
+import { CreateChat, ShowToast } from '../../apiCalls';
+import * as z from 'zod';
 
 const NewChat = (props) => {
   const { navigation } = props;
-  const [chatCreated, setChatCreated] = useState(false);
   const [errorCreatingChat, setErrorCreatingChat] = useState(false);
+  const [successful, setSuccessful] = useState(false);
+  const [unauthorized, setUnauthorized] = useState(false);
+  const [serverError, setServerError] = useState(false);
   const { ...methods } = useForm();
+  const Schema = z.string().min(1).max(1000); // Schema to validate the search query
+  const [errorMessage, setErrorMessage] = useState(''); // State to store the error message
+
   const onSubmit = async (data) => {
     try {
-      setChatCreated(false);
       setErrorCreatingChat(false);
-      const createChat = await CreateChat(
+      setSuccessful(false);
+      setUnauthorized(false);
+      setServerError(false);
+      await CreateChat(
+        Schema.parse(data),
         data,
-        setChatCreated,
-        setErrorCreatingChat
+        setSuccessful,
+        setErrorCreatingChat,
+        setUnauthorized,
+        setServerError
       );
       navigation.navigate(ROUTES.MAIN);
-    } catch (error) {}
+    } catch (error) {
+      setErrorMessage(error.message); // Set the error message
+    }
   };
+  useEffect(() => {
+    if (successful) {
+      ShowToast('success', 'Request successful');
+    }
+    if (errorCreatingChat) {
+      // Handle the error
+      ShowToast('error', 'Error Something went wrong');
+    }
+    if (unauthorized) {
+      navigation.navigate(ROUTES.LOGIN);
+    }
+    if (serverError) {
+      // Handle the server error
+      ShowToast('error', 'Server error');
+    }
+  }, [successful, unauthorized, errorCreatingChat, serverError]);
 
   return (
     <View className={'w-full h-full bg-white flex flex-col p-4'}>
@@ -43,6 +72,11 @@ const NewChat = (props) => {
               placeholder='Enter Chat Name'
               keyboardType='default'
             />
+            {errorMessage ? (
+              <Text className='text-red-500 p-1 text-center'>
+                Cannot be empty
+              </Text>
+            ) : null}
             <TouchableOpacity
               onPress={methods.handleSubmit(onSubmit)}
               className={

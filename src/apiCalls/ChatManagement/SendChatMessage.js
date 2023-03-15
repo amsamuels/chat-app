@@ -5,8 +5,11 @@ import { data } from 'autoprefixer';
 const SendChatMessage = async (
   data,
   chat_id,
-  setSuccessfullySentMessage,
-  setErrorSendingMesaage
+  setError,
+  setUnauthorized,
+  setForbidden,
+  setNotFound,
+  setServerError
 ) => {
   try {
     const token = await AsyncStorage.getItem('@token');
@@ -22,14 +25,22 @@ const SendChatMessage = async (
 
     if (res?.status === 200) {
       console.log('Send Chat Message: Successfully sent message');
-      setSuccessfullySentMessage(true);
     } else if (res?.status === 401) {
       console.log('Send Chat Message: Unauthorized');
-      setErrorSendingMesaage(true);
+      setUnauthorized(true);
+    } else if (res?.status === 400) {
+      console.log('Send Chat Message: Bad Request');
+      setError(true);
+    } else if (res?.status === 404) {
+      console.log('Send Chat Message: Not Found');
+      setNotFound(true);
+    } else if (res?.status === 500) {
+      console.log('Send Chat Message: Internal Server Error');
+      setServerError(true);
     }
   } catch (error) {
     console.error('Add User to Chat: Unauthorized', error);
-    setErrorSendingMesaage(true);
+    setError(true);
     throw error;
   }
 };

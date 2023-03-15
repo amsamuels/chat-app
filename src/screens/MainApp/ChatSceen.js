@@ -13,6 +13,7 @@ import {
   GetChatdetails,
   DeleteMessage,
   EditMessage,
+  ShowToast,
 } from '../../apiCalls';
 import * as z from 'zod';
 import { Ionicons } from '@expo/vector-icons';
@@ -23,31 +24,34 @@ const ChatSceen = (props) => {
   const { navigation } = props;
   const { route } = props;
   const [sendMessages, setSendMessages] = useState('');
-  const [SuccessfullyGotMessages, setSuccessfullyGotMessages] = useState(false); // this is to check if the messages were successfully fetched
-  const [errorGettingMessages, setErrorGettingMessages] = useState(false); // this is to check if there was an error fetching the messages
-  const [errorSendingMesaage, setErrorSendingMesaage] = useState(false); // this is to check if there was an error sending the message
-  const [successfullySentMessage, setSuccessfullySentMessage] = useState(false); // this is to check if the message was successfully sent
-  const [DeleteMessageSuccess, setDeleteMessageSuccess] = useState(false); // this is to check if the message was successfully deleted
-  const [DeleteMessageError, setDeleteMessageError] = useState(false); // this is to check if there was an error deleting the message
+  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage2, setErrorMessage2] = useState('');
   const [chatMessages, setChatMessages] = useState([]);
   const chat_id = route.params.chat_id;
   const messageSchema = z.string().min(1).max(1000);
-  const [errorMessage, setErrorMessage] = useState('');
-  const [errorMessage2, setErrorMessage2] = useState('');
-
+  const [DeleteMessageSuccess, setDeleteMessageSuccess] = useState(false); // this is to check if the message was successfully deleted
+  const [DeleteMessageError, setDeleteMessageError] = useState(false); // this is to check if there was an error deleting the message
+  const [error, setError] = useState(false);
+  const [successful, setSuccessful] = useState(false);
+  const [unauthorized, setUnauthorized] = useState(false);
+  const [forbidden, setForbidden] = useState(false);
+  const [notFound, setNotFound] = useState(false);
+  const [serverError, setServerError] = useState(false);
   const handleSendMessage = async () => {
     try {
       Keyboard.dismiss();
       const messageData = { message: messageSchema.parse(sendMessages) };
-      const response = await SendChatMessage(
+      await SendChatMessage(
         messageData,
         chat_id,
-        setSuccessfullySentMessage,
-        setErrorSendingMesaage
+        setError,
+        setUnauthorized,
+        setForbidden,
+        setNotFound,
+        setServerError
       );
       setSendMessages('');
       setErrorMessage('');
-      Keyboard.dismiss();
       getChatMessages();
     } catch (error) {
       // Handle the error
@@ -57,14 +61,14 @@ const ChatSceen = (props) => {
 
   const getChatMessages = async () => {
     try {
-      setSuccessfullyGotMessages(true);
-      setErrorGettingMessages(false);
       const response = await GetChatdetails(
         chat_id,
-        setSuccessfullyGotMessages,
-        setErrorGettingMessages
+        setError,
+        setUnauthorized,
+        setForbidden,
+        setNotFound,
+        setServerError
       );
-      console.log(response);
       setChatMessages(response);
     } catch (error) {
       // Handle the error
@@ -84,12 +88,16 @@ const ChatSceen = (props) => {
   const handleUpdate = async (message_id) => {
     try {
       const messageData = { message: messageSchema.parse(editedMessage) };
-      const response = await EditMessage(
+      await EditMessage(
         chat_id,
         message_id,
         messageData,
-        setSuccessfullySentMessage,
-        setErrorSendingMesaage
+        setSuccessful,
+        setError,
+        setUnauthorized,
+        setForbidden,
+        setNotFound,
+        setServerError
       );
       setErrorMessage2('');
       setSelectedMessageId(null);
@@ -107,8 +115,12 @@ const ChatSceen = (props) => {
       const response = await DeleteMessage(
         chat_id,
         message_id,
-        setDeleteMessageSuccess,
-        setDeleteMessageError
+        setSuccessful,
+        setError,
+        setUnauthorized,
+        setForbidden,
+        setNotFound,
+        setServerError
       );
       getChatMessages();
     } catch (error) {
@@ -118,6 +130,7 @@ const ChatSceen = (props) => {
   const [userId, setUserId] = useState(null);
 
   useEffect(() => {
+    getChatMessages();
     const getUserId = async () => {
       try {
         const id = await AsyncStorage.getItem('@id');
@@ -131,16 +144,43 @@ const ChatSceen = (props) => {
       }
     };
     getUserId();
-    if (SuccessfullyGotMessages) {
-      getChatMessages();
+
+    if (successful) {
+      ShowToast('success', 'Request successful');
     }
-    if (successfullySentMessage) {
-      getChatMessages();
+    if (error) {
+      // Handle the error
+      ShowToast('error', 'Error Something went wrong');
     }
+    if (unauthorized) {
+      navigation.navigate(ROUTES.LOGIN);
+    }
+    if (forbidden) {
+      // Handle the error
+      navigation.navigate(ROUTES.LOGIN);
+    }
+    if (notFound) {
+      // Handle the error
+      ShowToast('error', 'Not found');
+    }
+    if (serverError) {
+      // Handle the error
+      ShowToast('error', 'Server error');
+    }
+    if (DeleteMessageError) {
+      // Handle the error
+    }
+
     if (DeleteMessageSuccess) {
       getChatMessages();
     }
-  }, []);
+    const unsubscribe = navigation.addListener('focus', () => {
+      // Call the functions that fetch data again to update the state
+      getChatMessages();
+    });
+    return unsubscribe;
+  }, [error, successful, unauthorized, forbidden, notFound, serverError]);
+
   const { name, messages } = JSON.parse(JSON.stringify(chatMessages));
   const renderItem = ({ item }) => {
     if (item.author.user_id == userId) {
@@ -232,21 +272,6 @@ const ChatSceen = (props) => {
     }
   };
 
-  useEffect(() => {
-    getChatMessages();
-    if (SuccessfullyGotMessages) {
-      console.log(chatMessages);
-      // Scroll to the last item in the list
-    }
-    if (errorGettingMessages) {
-      console.log('error');
-    }
-    const unsubscribe = navigation.addListener('focus', () => {
-      // Call the functions that fetch data again to update the state
-      getChatMessages();
-    });
-    return unsubscribe;
-  }, [navigation, SuccessfullyGotMessages, errorGettingMessages]);
   return (
     <View
       className={'w-full h-full bg-white flex flex-col justify-between p-4'}

@@ -19,6 +19,9 @@ const GetChats = async (setGetChatsSuccess, setGetChatsError) => {
     } else if (res?.status === 401) {
       console.log('Get Chat List: Unauthorized');
       setGetChatsError(true);
+    } else if (res?.status === 500) {
+      console.log('Get Chat List: Internal Server Error');
+      setGetChatsError(true);
     }
   } catch (error) {
     console.error('Get Chat List: Unauthorized', error);
