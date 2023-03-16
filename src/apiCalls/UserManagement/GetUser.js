@@ -5,7 +5,7 @@ const GetUser = async (
   setGetUserSuccess,
   setUnauthorized,
   setErrorGettingUser,
-  setServerError
+  setServerError,
 ) => {
   try {
     const token = await AsyncStorage.getItem('@token'); // Get token from storage
@@ -24,7 +24,7 @@ const GetUser = async (
       console.log('get user: Successfully got user'); // Log success
       setGetUserSuccess(true); // Set success to true
       return data; // Return data
-    } else if (res?.status === 401) {
+    } if (res?.status === 401) {
       // If response is 401
       console.log('get user: Failed to get user'); // Log failure
       setUnauthorized(true); // Set unauthorized to true

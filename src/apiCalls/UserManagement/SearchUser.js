@@ -13,13 +13,13 @@ const SearchUser = async (searchText, type, setForbidden, setUnauthorized) => {
           Accept: 'application/json',
           'X-Authorization': token,
         },
-      }
+      },
     );
     const resJson = await res.json();
     if (res?.status === 200) {
       console.log('Successfully searched user');
       return resJson;
-    } else if (res?.status === 401) {
+    } if (res?.status === 401) {
       console.log('Failed to search user: Unauthorized');
       setUnauthorized(true);
     } else if (res?.status === 403) {

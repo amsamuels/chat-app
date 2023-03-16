@@ -9,7 +9,7 @@ const RemoveUserFromChat = async (
   setUnauthorized,
   setForbidden,
   setNotFound,
-  setServerError
+  setServerError,
 ) => {
   try {
     const token = await AsyncStorage.getItem('@token');

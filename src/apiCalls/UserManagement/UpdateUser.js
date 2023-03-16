@@ -9,7 +9,7 @@ const UpdateUser = async (
   setBadRequest,
   setServerError,
   setNotFound,
-  setUpdateError
+  setUpdateError,
 ) => {
   try {
     const token = await AsyncStorage.getItem('@token'); // Get token from async storage

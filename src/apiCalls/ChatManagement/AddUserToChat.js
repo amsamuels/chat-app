@@ -9,7 +9,7 @@ const AddUserToChat = async (
   setUnauthorized,
   setForbidden,
   setNotFound,
-  setServerError
+  setServerError,
 ) => {
   try {
     const token = await AsyncStorage.getItem('@token'); // Get token from local storage

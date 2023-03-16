@@ -1,13 +1,13 @@
 import { View, Text } from 'react-native';
 import { useState, useEffect } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
-import { Button, TextInput } from '../../components';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { LoginUser } from '../../apiCalls';
-import { ShowToast } from '../../apiCalls';
-import { ROUTES } from '../../constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Button, TextInput } from '../../components';
+import { LoginUser, ShowToast } from '../../apiCalls';
+
+import { ROUTES } from '../../constants';
 
 // This is the schema for the form
 const FormSchema = z.object({
@@ -15,7 +15,7 @@ const FormSchema = z.object({
   password: z.string().min(8, { message: 'Password needs to be 8 characters' }), // The password field needs to be a string and at least 8 characters long
 });
 
-const Login = (props) => {
+function Login(props) {
   // Destructure the navigation prop
   const { navigation } = props;
   const { ...methods } = useForm({
@@ -53,7 +53,7 @@ const Login = (props) => {
         setLoggedIn,
         setIcorrectLogin,
         setLoginError,
-        setServerError
+        setServerError,
       );
     } catch (error) {
       console.error('Failed to Login user:', error);
@@ -82,40 +82,40 @@ const Login = (props) => {
   }, [loggedIn, icorrectLogin, loginError]);
 
   return (
-    <View className='w-full h-full bg-white pt-10 flex flex-col my-4 items-center'>
-      <Text className='text-xl py-6 font-semibold'>Login To Your Account</Text>
-      <View className='flex flex-col  px-4 mb-4'>
+    <View className="w-full h-full bg-white pt-10 flex flex-col my-4 items-center">
+      <Text className="text-xl py-6 font-semibold">Login To Your Account</Text>
+      <View className="flex flex-col  px-4 mb-4">
         <FormProvider {...methods}>
-          <View className={'py-6'}>
+          <View className="py-6">
             <TextInput
-              name='email'
-              label='Email'
-              placeholder='jon.doe@email.com'
-              keyboardType='email-address'
+              name="email"
+              label="Email"
+              placeholder="jon.doe@email.com"
+              keyboardType="email-address"
             />
             {methods.formState.errors.email && (
-              <Text className='text-red-700'>
+              <Text className="text-red-700">
                 {methods.formState.errors.email.message}
               </Text>
             )}
 
             <TextInput
-              name='password'
-              label='Password'
-              placeholder='********'
+              name="password"
+              label="Password"
+              placeholder="********"
               secureTextEntry
             />
             {methods.formState.errors.password && (
-              <Text className='text-red-700'>
+              <Text className="text-red-700">
                 {methods.formState.errors.password.message}
               </Text>
             )}
           </View>
-          <Button onPress={methods.handleSubmit(onSubmit)} text='Login' />
+          <Button onPress={methods.handleSubmit(onSubmit)} text="Login" />
         </FormProvider>
       </View>
     </View>
   );
-};
+}
 
 export default Login;

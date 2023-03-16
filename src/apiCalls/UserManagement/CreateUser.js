@@ -4,7 +4,7 @@ const CreateUser = async (
   user,
   setAccountCreated,
   setSignupError,
-  setServerError
+  setServerError,
 ) => {
   try {
     const res = await fetch(`${API_URL}user`, {

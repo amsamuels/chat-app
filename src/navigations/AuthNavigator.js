@@ -1,7 +1,9 @@
 import React from 'react';
 import { Button } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { WelcomeScreen, SignUp, Login, Contacts } from '../screens';
+import {
+  WelcomeScreen, SignUp, Login, Contacts,
+} from '../screens';
 import { ROUTES } from '../constants';
 import BottomTabNavigator from './BottomTabNavigator';
 

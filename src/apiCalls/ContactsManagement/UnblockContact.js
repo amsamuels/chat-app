@@ -7,7 +7,7 @@ const UnblockContact = async (
   setErrorBlocking,
   setForbidden,
   setUnauthorized,
-  setServerError
+  setServerError,
 ) => {
   try {
     const token = await AsyncStorage.getItem('@token'); // Get token from AsyncStorage

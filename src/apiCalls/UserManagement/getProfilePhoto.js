@@ -4,7 +4,7 @@ import { API_URL } from '@env';
 const getProfilePhoto = async (
   setUnauthorized,
   setForbidden,
-  setServerError
+  setServerError,
 ) => {
   try {
     const token = await AsyncStorage.getItem('@token');
@@ -22,7 +22,7 @@ const getProfilePhoto = async (
       const blob = await res.blob(); // Get blob from response
       const photoUrl = URL.createObjectURL(blob); // Create object url from blob
       return photoUrl; // Return photo url
-    } else if (res?.status === 401) {
+    } if (res?.status === 401) {
       // If response is 401
       console.log('get profile photo: Unauthorized'); // Log failure
       setUnauthorized(true); // Set error to true

@@ -1,12 +1,12 @@
-import { View, Text, Subheading, Keyboard } from 'react-native';
+import { View, Text } from 'react-native';
 import { useState, useEffect } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
-import { Button, TextInput } from '../../components';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Button, TextInput } from '../../components';
 import { CreateUser, ShowToast, FormSchema } from '../../apiCalls';
 import { ROUTES } from '../../constants';
 
-const SignUp = (props) => {
+function SignUp(props) {
   const { navigation } = props; // Destructure props
   const { ...methods } = useForm({
     // Use the useForm hook
@@ -41,7 +41,7 @@ const SignUp = (props) => {
         // Show a toast with the error message
         'error',
         'Oops, Error creating account. Try again.',
-        'Password requires 1 upper, 1 number, 1 special character'
+        'Password requires 1 upper, 1 number, 1 special character',
       );
     }
     if (serverError) {
@@ -52,64 +52,64 @@ const SignUp = (props) => {
   }, [accountCreated, signupError]); // Add the accountCreated and signupError states to the useEffect hook
 
   return (
-    <View className='w-full h-full bg-white pt-10 flex flex-col my-4 items-center'>
-      <Text className='text-xl py-6 font-semibold'>Create Your Account</Text>
-      <View className='flex flex-col  px-4 mb-4'>
+    <View className="w-full h-full bg-white pt-10 flex flex-col my-4 items-center">
+      <Text className="text-xl py-6 font-semibold">Create Your Account</Text>
+      <View className="flex flex-col  px-4 mb-4">
         <FormProvider {...methods}>
-          <View className='py-6'>
+          <View className="py-6">
             <TextInput
-              name='first_name'
-              label='First Name'
-              placeholder='first name'
-              keyboardType='default'
+              name="first_name"
+              label="First Name"
+              placeholder="first name"
+              keyboardType="default"
             />
             {methods.formState.errors.first_name && (
-              <Text className='text-red-700'>
+              <Text className="text-red-700">
                 {methods.formState.errors.first_name.message}
               </Text>
             )}
             <TextInput
-              name='last_name'
-              label='Last Name'
-              placeholder='last name'
-              keyboardType='default'
+              name="last_name"
+              label="Last Name"
+              placeholder="last name"
+              keyboardType="default"
             />
             {methods.formState.errors.last_name && (
-              <Text className={'text-red-700'}>
+              <Text className="text-red-700">
                 {methods.formState.errors.last_name.message}
               </Text>
             )}
             <TextInput
-              name='email'
-              label='Email'
-              placeholder='jon.doe@email.com'
-              keyboardType='email-address'
+              name="email"
+              label="Email"
+              placeholder="jon.doe@email.com"
+              keyboardType="email-address"
             />
             {methods.formState.errors.email && (
-              <Text className={'text-red-700'}>
+              <Text className="text-red-700">
                 {methods.formState.errors.email.message}
               </Text>
             )}
             <TextInput
-              name='password'
-              label='Password'
-              placeholder='********'
+              name="password"
+              label="Password"
+              placeholder="********"
               secureTextEntry
             />
             {methods.formState.errors.password && (
-              <Text className={'text-red-700'}>
+              <Text className="text-red-700">
                 {methods.formState.errors.password.message}
               </Text>
             )}
           </View>
           <Button
             onPress={methods.handleSubmit(onSubmit)}
-            text='Create Account'
+            text="Create Account"
           />
         </FormProvider>
       </View>
     </View>
   );
-};
+}
 
 export default SignUp;

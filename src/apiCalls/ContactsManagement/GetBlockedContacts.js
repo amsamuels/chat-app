@@ -16,10 +16,10 @@ const GetBlockedContacts = async (setServerError, setUnauthorized) => {
     if (res?.status === 200) {
       // 200 is the status code for a successful request
       console.log(
-        'Get Blocked Contacts : Successfully got blocked contacts list'
+        'Get Blocked Contacts : Successfully got blocked contacts list',
       );
       return data; // return the data
-    } else if (res?.status === 401) {
+    } if (res?.status === 401) {
       // 401 is the status code for an unauthorized request
       console.log('Get Blocked Contacts: Unauthorized'); // log the error
       setUnauthorized(true); // set the unauthorized state to true

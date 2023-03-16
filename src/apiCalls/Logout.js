@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_URL } from '@env';
+
 const LogOut = async (props) => {
   const token = await AsyncStorage.getItem('@token');
   const res = await fetch(`${API_URL}logout`, {

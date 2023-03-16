@@ -6,7 +6,7 @@ const deleteContact = async (
   setForbidden,
   setUnauthorized,
   setServerError,
-  setYourself
+  setYourself,
 ) => {
   try {
     const token = await AsyncStorage.getItem('@token'); // get token from async storage

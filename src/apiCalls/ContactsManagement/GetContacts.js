@@ -1,5 +1,6 @@
 import { API_URL } from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
 const GetContact = async (setUnauthorized, setServerError) => {
   try {
     const token = await AsyncStorage.getItem('@token'); // get the token from async storage
@@ -17,7 +18,7 @@ const GetContact = async (setUnauthorized, setServerError) => {
       // if status is 200, then the contact was successfully deleted
       console.log('Get Contacts: Successfully got contacts list'); // log to console
       return data; // return the data
-    } else if (res?.status === 401) {
+    } if (res?.status === 401) {
       // if status is 401, then the contact was not successfully deleted
       console.log('Get Contacts: Unauthorized'); // log to console
       setUnauthorized(true); // set state to true

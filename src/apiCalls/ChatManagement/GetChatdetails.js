@@ -7,7 +7,7 @@ const GetChatDetails = async (
   setUnauthorized,
   setForbidden,
   setNotFound,
-  setServerError
+  setServerError,
 ) => {
   try {
     const token = await AsyncStorage.getItem('@token'); // Get token from local storage
@@ -26,7 +26,7 @@ const GetChatDetails = async (
       // If request was successful
       console.log('Get Chat Details: Successfully got Chat Details'); // Log success
       return data; // Return data
-    } else if (res?.status === 401) {
+    } if (res?.status === 401) {
       // If request was unauthorized
       console.log('Get Chat Details: Unauthorized'); // Log error
       setUnauthorized(true); // Set state to true

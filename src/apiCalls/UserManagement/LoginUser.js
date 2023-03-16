@@ -1,5 +1,5 @@
-import StoreData from '../StoreData';
 import { API_URL } from '@env';
+import StoreData from '../StoreData';
 
 // This function is used to login a user
 const LoginUser = async (
@@ -7,7 +7,7 @@ const LoginUser = async (
   setLoggedIn,
   setIcorrectLogin,
   setLoginError,
-  setServerError
+  setServerError,
 ) => {
   try {
     const res = await fetch(`${API_URL}login`, {

@@ -16,7 +16,7 @@ const GetChats = async (setGetChatsSuccess, setGetChatsError) => {
       console.log('Get Chat List: Successfully got Chat List');
       setGetChatsSuccess(true);
       return data;
-    } else if (res?.status === 401) {
+    } if (res?.status === 401) {
       console.log('Get Chat List: Unauthorized');
       setGetChatsError(true);
     } else if (res?.status === 500) {

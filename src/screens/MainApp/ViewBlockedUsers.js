@@ -1,11 +1,12 @@
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import {
+  View, Text, TouchableOpacity, ScrollView,
+} from 'react-native';
 import { useState, useEffect } from 'react';
-import { ROUTES } from '../../constants';
-import { GetBlockedContacts, UnblockContact } from '../../apiCalls';
 import { Feather } from '@expo/vector-icons';
-import { ShowToast } from '../../apiCalls';
+import { ROUTES } from '../../constants';
+import { GetBlockedContacts, UnblockContact, ShowToast } from '../../apiCalls';
 
-const ViewBlockedUsers = (props) => {
+function ViewBlockedUsers(props) {
   const { navigation } = props; // Destructure the navigation prop
   const [blockedContacts, setBlockedContacts] = useState([]); // Set the blocked contacts state
   const [SuccessfullyUnblocked, setSuccessfullyUnblocked] = useState(false); // Set the successfully unblocked state
@@ -19,7 +20,7 @@ const ViewBlockedUsers = (props) => {
     const getBlockedContacts = await GetBlockedContacts(
       // Call the get blocked contacts api
       setServerError,
-      setUnauthorized
+      setUnauthorized,
     );
     setBlockedContacts(getBlockedContacts); // Set the blocked contacts state
   };
@@ -32,7 +33,7 @@ const ViewBlockedUsers = (props) => {
       setErrorBlocking,
       setForbidden,
       setUnauthorized,
-      setServerError
+      setServerError,
     );
     getBlockedContacts(); // Get the blocked contacts
   };
@@ -63,53 +64,53 @@ const ViewBlockedUsers = (props) => {
   }, [SuccessfullyUnblocked]);
 
   return (
-    <View className={'w-full h-full bg-white flex flex-col p-4'}>
-      <View className={'flex flex-row justify-between '}>
+    <View className="w-full h-full bg-white flex flex-col p-4">
+      <View className="flex flex-row justify-between ">
         <TouchableOpacity
           onPress={() => navigation.navigate(ROUTES.SETTING)}
-          className={'px-2'}
+          className="px-2"
         >
-          <Text className={'px-2 py-2 font-semibold  text-lg'}>Back</Text>
+          <Text className="px-2 py-2 font-semibold  text-lg">Back</Text>
         </TouchableOpacity>
-        <Text className={'px-2 py-2 font-semibold  text-lg'}>
+        <Text className="px-2 py-2 font-semibold  text-lg">
           Blocked Contacts
         </Text>
-        <View className={'px-2'} />
+        <View className="px-2" />
       </View>
       <ScrollView>
-        <View className='max-w-md divide-y divide-gray-200'>
-          {blockedContacts.map((contact) => {
-            return (
-              <View
-                key={contact.user_id}
-                className=' flex flex-row justify-between pb-2 pt-2'
-              >
-                <View className='flex items-center p-4 space-x-4'>
-                  <View className='flex-1 min-w-0'>
-                    <Text className='text-sm font-medium text-gray-900 truncate'>
-                      {contact.first_name} {contact.last_name}
-                    </Text>
+        <View className="max-w-md divide-y divide-gray-200">
+          {blockedContacts.map((contact) => (
+            <View
+              key={contact.user_id}
+              className=" flex flex-row justify-between pb-2 pt-2"
+            >
+              <View className="flex items-center p-4 space-x-4">
+                <View className="flex-1 min-w-0">
+                  <Text className="text-sm font-medium text-gray-900 truncate">
+                    {contact.first_name}
+                    {' '}
+                    {contact.last_name}
+                  </Text>
 
-                    <Text className='text-sm font-medium text-gray-900 truncate'>
-                      {contact.email}
-                    </Text>
-                  </View>
-                </View>
-                <View className='flex flex-row space-x-3 items-center'>
-                  <TouchableOpacity
-                    onPress={() => handleUnblockContact(contact.user_id)}
-                    className='mt-2 flex'
-                  >
-                    <Feather name='user-plus' size={24} color='black' />
-                  </TouchableOpacity>
+                  <Text className="text-sm font-medium text-gray-900 truncate">
+                    {contact.email}
+                  </Text>
                 </View>
               </View>
-            );
-          })}
+              <View className="flex flex-row space-x-3 items-center">
+                <TouchableOpacity
+                  onPress={() => handleUnblockContact(contact.user_id)}
+                  className="mt-2 flex"
+                >
+                  <Feather name="user-plus" size={24} color="black" />
+                </TouchableOpacity>
+              </View>
+            </View>
+          ))}
         </View>
       </ScrollView>
     </View>
   );
-};
+}
 
 export default ViewBlockedUsers;

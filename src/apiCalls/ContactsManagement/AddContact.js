@@ -8,7 +8,7 @@ const AddContact = async (
   setForbidden,
   setUnauthorized,
   setCannoAddyourself,
-  setServerError
+  setServerError,
 ) => {
   try {
     const token = await AsyncStorage.getItem('@token'); // get token from async storage

@@ -3,6 +3,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { ROUTES } from '../constants';
 import ContactStack from './ContactNavigator';
 import ChatStack from './ChatNavigator';
+
 const Stack = createStackNavigator();
 
 function HomeStack() {

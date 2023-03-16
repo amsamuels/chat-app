@@ -1,6 +1,8 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import { Main, NewChat, ChatSceen, ChatSettings } from '../screens';
+import {
+  Main, NewChat, ChatSceen, ChatSettings,
+} from '../screens';
 import { ROUTES } from '../constants';
 
 const Stack = createStackNavigator();
