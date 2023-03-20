@@ -1,15 +1,18 @@
 import * as ImagePicker from 'expo-image-picker';
+import ShowToast from './ShowToast';
 
 const pickImage = async () => {
   try {
     const cameraStatus = await ImagePicker.requestCameraPermissionsAsync();
-    const mediaLibraryStatus = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const mediaLibraryStatus =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (
-      cameraStatus.status !== 'granted'
-      || mediaLibraryStatus.status !== 'granted'
+      cameraStatus.status !== 'granted' ||
+      mediaLibraryStatus.status !== 'granted'
     ) {
-      alert(
-        'Sorry, we need camera and media library permissions to make this work!',
+      ShowToast(
+        'error',
+        'Sorry, we need camera and media library permissions to make this work!'
       );
       return;
     }

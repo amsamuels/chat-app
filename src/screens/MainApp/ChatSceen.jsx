@@ -76,6 +76,7 @@ function ChatSceen(props) {
       if (draft !== null) {
         setSendMessages(draft);
       }
+      await AsyncStorage.removeItem('@draft');
     } catch (error) {
       console.log(error);
     }
