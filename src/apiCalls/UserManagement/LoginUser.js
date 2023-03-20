@@ -1,4 +1,3 @@
-import { API_URL } from '@env';
 import StoreData from '../StoreData';
 
 // This function is used to login a user
@@ -10,7 +9,7 @@ const LoginUser = async (
   setServerError,
 ) => {
   try {
-    const res = await fetch(`${API_URL}login`, {
+    const res = await fetch(`${process.env.API_URL}login`, {
       // Make a request to the login endpoint
       method: 'POST', // Use the POST method
       headers: {

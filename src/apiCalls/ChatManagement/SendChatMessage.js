@@ -1,10 +1,8 @@
-import { API_URL } from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { data } from 'autoprefixer';
 
 const SendChatMessage = async (
   data,
-  chat_id,
+  chatId,
   setError,
   setUnauthorized,
   setForbidden,
@@ -13,7 +11,7 @@ const SendChatMessage = async (
 ) => {
   try {
     const token = await AsyncStorage.getItem('@token');
-    const res = await fetch(`${API_URL}chat/${chat_id}/message`, {
+    const res = await fetch(`${process.env.API_URL}chat/${chatId}/message`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',

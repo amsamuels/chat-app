@@ -1,11 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { API_URL } from '@env';
 
 const GetBlockedContacts = async (setServerError, setUnauthorized) => {
   // pass in the setServerError and setUnauthorized functions as parameters
   try {
     const token = await AsyncStorage.getItem('@token'); // get the token from async storage
-    const res = await fetch(`${API_URL}blocked`, {
+    const res = await fetch(`${process.env.API_URL}blocked`, {
       method: 'GET',
       headers: {
         Accept: 'application/json',
@@ -19,7 +18,8 @@ const GetBlockedContacts = async (setServerError, setUnauthorized) => {
         'Get Blocked Contacts : Successfully got blocked contacts list',
       );
       return data; // return the data
-    } if (res?.status === 401) {
+    }
+    if (res?.status === 401) {
       // 401 is the status code for an unauthorized request
       console.log('Get Blocked Contacts: Unauthorized'); // log the error
       setUnauthorized(true); // set the unauthorized state to true
@@ -28,6 +28,7 @@ const GetBlockedContacts = async (setServerError, setUnauthorized) => {
       console.log('Get Blocked Contacts: Server Error'); // log the error
       setServerError(true); // set the server error state to true
     }
+    return null; // add this line to ensure that the function always returns a value
   } catch (error) {
     // catch any errors
     console.error('Failed to get blocked contacts list:', error); // log the error

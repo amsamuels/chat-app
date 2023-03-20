@@ -1,11 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { API_URL } from '@env';
 
 const SearchUser = async (searchText, type, setForbidden, setUnauthorized) => {
   try {
     const token = await AsyncStorage.getItem('@token');
     const res = await fetch(
-      `${API_URL}search?q=${searchText}&search_in=${type}&limit=20&offset=0`,
+      `${process.env.API_URL}search?q=${searchText}&search_in=${type}&limit=20&offset=0`,
       {
         method: 'GET',
         headers: {
@@ -26,6 +25,7 @@ const SearchUser = async (searchText, type, setForbidden, setUnauthorized) => {
       console.log('Failed to search user: Forbidden');
       setForbidden(true);
     }
+    return null; // add this line to ensure that the function always returns a value
   } catch (error) {
     console.error('Failed to search user:', error);
     throw error;

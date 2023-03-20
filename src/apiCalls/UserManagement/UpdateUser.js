@@ -1,5 +1,4 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { API_URL } from '@env';
 
 const UpdateUser = async (
   data,
@@ -14,7 +13,7 @@ const UpdateUser = async (
   try {
     const token = await AsyncStorage.getItem('@token'); // Get token from async storage
     const id = await AsyncStorage.getItem('@id'); // Get user id from async storage
-    const res = await fetch(`${API_URL}user/${id}`, {
+    const res = await fetch(`${process.env.API_URL}user/${id}`, {
       method: 'PATCH',
       headers: {
         Accept: 'application/json',

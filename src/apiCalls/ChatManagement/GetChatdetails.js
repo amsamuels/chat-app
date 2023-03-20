@@ -1,5 +1,4 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { API_URL } from '@env';
 
 const GetChatDetails = async (
   id,
@@ -11,22 +10,26 @@ const GetChatDetails = async (
 ) => {
   try {
     const token = await AsyncStorage.getItem('@token'); // Get token from local storage
-    const res = await fetch(`${API_URL}chat/${id}?limit=20&offset=0`, {
-      // Send request to API
-      method: 'GET', // Set method to GET
-      headers: {
-        // Set headers
-        Accept: 'application/json', // Accept JSON response
-        'Content-Type': 'application/json', // Send JSON data
-        'X-Authorization': token, // Send token
+    const res = await fetch(
+      `${process.env.API_URL}chat/${id}?limit=20&offset=0`,
+      {
+        // Send request to API
+        method: 'GET', // Set method to GET
+        headers: {
+          // Set headers
+          Accept: 'application/json', // Accept JSON response
+          'Content-Type': 'application/json', // Send JSON data
+          'X-Authorization': token, // Send token
+        },
       },
-    });
+    );
     const data = await res.json(); // Get response data
     if (res?.status === 200) {
       // If request was successful
       console.log('Get Chat Details: Successfully got Chat Details'); // Log success
       return data; // Return data
-    } if (res?.status === 401) {
+    }
+    if (res?.status === 401) {
       // If request was unauthorized
       console.log('Get Chat Details: Unauthorized'); // Log error
       setUnauthorized(true); // Set state to true
@@ -43,6 +46,7 @@ const GetChatDetails = async (
       console.log('Get Chat Details: Server error'); // Log error
       setServerError(true); // Set state to true
     }
+    return null; // add this line to ensure that the function always returns a value
   } catch (error) {
     // If request failed
     console.error('Get Chat Details: Unauthorized', error); // Log error

@@ -1,9 +1,8 @@
-import { API_URL } from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AddUserToChat = async (
-  chat_id,
-  user_id,
+  chatId,
+  userId,
   setSuccessful,
   setError,
   setUnauthorized,
@@ -13,16 +12,19 @@ const AddUserToChat = async (
 ) => {
   try {
     const token = await AsyncStorage.getItem('@token'); // Get token from local storage
-    const res = await fetch(`${API_URL}chat/${chat_id}/user/${user_id}`, {
-      // Send request to API
-      method: 'POST', // Set method to POST
-      headers: {
-        // Set headers
-        Accept: 'application/json', // Accept JSON response
-        'Content-Type': 'application/json', // Send JSON data
-        'X-Authorization': token, // Send token
+    const res = await fetch(
+      `${process.env.API_URL}chat/${chatId}/user/${userId}`,
+      {
+        // Send request to API
+        method: 'POST', // Set method to POST
+        headers: {
+          // Set headers
+          Accept: 'application/json', // Accept JSON response
+          'Content-Type': 'application/json', // Send JSON data
+          'X-Authorization': token, // Send token
+        },
       },
-    });
+    );
     if (res?.status === 200) {
       // If request was successful
       console.log('Add User to Chat: Successfully Added User to Chat'); // Log success

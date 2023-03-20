@@ -1,4 +1,3 @@
-import { API_URL } from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const deleteContact = async (
@@ -10,7 +9,7 @@ const deleteContact = async (
 ) => {
   try {
     const token = await AsyncStorage.getItem('@token'); // get token from async storage
-    const res = await fetch(`${API_URL}user/${id}/contact`, {
+    const res = await fetch(`${process.env.API_URL}user/${id}/contact`, {
       // fetch from API
       method: 'DELETE', // set method to delete
       headers: {
@@ -23,7 +22,6 @@ const deleteContact = async (
     if (res?.status === 200) {
       // if status is 200, then the contact was successfully deleted
       console.log('Contact: Successfully Deleted Contact'); // log to console
-      setContactAdded(true); // set state to true
     } else if (res?.status === 400) {
       // if status is 400, then the contact was not successfully deleted
       console.log('Contact: You cannot delete yourself'); // log to console

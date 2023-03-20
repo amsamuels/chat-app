@@ -1,18 +1,18 @@
 import * as ImagePicker from 'expo-image-picker';
 
 const pickImage = async () => {
-  const cameraStatus = await ImagePicker.requestCameraPermissionsAsync();
-  const mediaLibraryStatus = await ImagePicker.requestMediaLibraryPermissionsAsync();
-  if (
-    cameraStatus.status !== 'granted'
-    || mediaLibraryStatus.status !== 'granted'
-  ) {
-    alert(
-      'Sorry, we need camera and media library permissions to make this work!',
-    );
-    return;
-  }
   try {
+    const cameraStatus = await ImagePicker.requestCameraPermissionsAsync();
+    const mediaLibraryStatus = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (
+      cameraStatus.status !== 'granted'
+      || mediaLibraryStatus.status !== 'granted'
+    ) {
+      alert(
+        'Sorry, we need camera and media library permissions to make this work!',
+      );
+      return;
+    }
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
@@ -22,8 +22,7 @@ const pickImage = async () => {
     if (!result.canceled) {
       return result.assets[0].uri;
     }
-    let cameraResult;
-    cameraResult = await ImagePicker.launchCameraAsync({
+    const cameraResult = await ImagePicker.launchCameraAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
       aspect: [4, 3],
@@ -32,6 +31,7 @@ const pickImage = async () => {
     if (!cameraResult.canceled) {
       return cameraResult.assets[0].uri;
     }
+    return null; // add this line to ensure that the function always returns a value
   } catch (E) {
     console.log(E);
   }

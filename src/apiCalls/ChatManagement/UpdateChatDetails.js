@@ -1,8 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { API_URL } from '@env';
 
 const UpdateChatDetails = async (
-  chat_id,
+  chatId,
   data,
   setSuccessful,
   setError,
@@ -13,7 +12,7 @@ const UpdateChatDetails = async (
 ) => {
   try {
     const token = await AsyncStorage.getItem('@token'); // Get token from local storage
-    const res = await fetch(`${API_URL}chat/${chat_id}`, {
+    const res = await fetch(`${process.env.API_URL}chat/${chatId}`, {
       // Send request to API
       method: 'PATCH', // Set method to PUT
       headers: {

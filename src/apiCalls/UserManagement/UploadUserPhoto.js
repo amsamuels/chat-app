@@ -1,5 +1,4 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { API_URL } from '@env';
 
 const UploadUserPhoto = async (
   data,
@@ -10,7 +9,6 @@ const UploadUserPhoto = async (
 ) => {
   try {
     const base64String = data.img.split(',')[1]; // remove the data:image/png;base64, part from the string
-    const mimeType = data.img.split(',')[0].split(':')[1].split(';')[0]; // get the MIME type of the image
     const blob = await fetch(`data:image/jpeg;base64,${base64String}`).then(
       (
         r, // Convert the base64 string to a blob
@@ -18,7 +16,7 @@ const UploadUserPhoto = async (
     );
     const token = await AsyncStorage.getItem('@token');
     const id = await AsyncStorage.getItem('@id');
-    const res = await fetch(`${API_URL}user/${id}/photo`, {
+    const res = await fetch(`${process.env.API_URL}user/${id}/photo`, {
       method: 'POST',
       headers: {
         'Content-Type': 'image/jpeg',

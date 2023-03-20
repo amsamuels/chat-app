@@ -1,9 +1,8 @@
-import { API_URL } from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const RemoveUserFromChat = async (
-  chat_id,
-  user_id,
+  chatID,
+  userId,
   setSuccessful,
   setErrorAddingUser,
   setUnauthorized,
@@ -13,14 +12,17 @@ const RemoveUserFromChat = async (
 ) => {
   try {
     const token = await AsyncStorage.getItem('@token');
-    const res = await fetch(`${API_URL}chat/${chat_id}/user/${user_id}`, {
-      method: 'DELETE',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        'X-Authorization': token,
+    const res = await fetch(
+      `${process.env.API_URL}chat/${chatID}/user/${userId}`,
+      {
+        method: 'DELETE',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          'X-Authorization': token,
+        },
       },
-    });
+    );
     if (res?.status === 200) {
       console.log('Remove User from Chat: Successfully removed user');
       setSuccessful(true);

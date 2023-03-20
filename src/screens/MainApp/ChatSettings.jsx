@@ -42,7 +42,7 @@ function ChatSettings(props) {
       const search_in = 'contacts';
       const response = await SearchUser(
         chatSchema.parse(searchQuery),
-        search_in
+        search_in,
       );
       setContacts(response);
       // Do something with the response data
@@ -68,7 +68,7 @@ function ChatSettings(props) {
         setUnauthorized,
         setForbidden,
         setNotFound,
-        setServerError
+        setServerError,
       );
       getChatDetails();
     } catch (error) {
@@ -92,7 +92,7 @@ function ChatSettings(props) {
         setUnauthorized,
         setForbidden,
         setNotFound,
-        setServerError
+        setServerError,
       );
       getChatDetails();
     } catch (error) {
@@ -111,7 +111,7 @@ function ChatSettings(props) {
         setUnauthorized,
         setForbidden,
         setNotFound,
-        setServerError
+        setServerError,
       );
       getChatDetails();
     } catch (error) {
@@ -127,7 +127,7 @@ function ChatSettings(props) {
         setUnauthorized,
         setForbidden,
         setNotFound,
-        setServerError
+        setServerError,
       );
       setChatDetails(response);
     } catch (error) {
@@ -157,82 +157,85 @@ function ChatSettings(props) {
   }, [successful, unauthorized, error, forbidden, notFound, serverError]);
 
   return (
-    <View className='w-full h-full bg-white flex flex-col p-4'>
-      <View className='flex flex-row justify-between items-center p-2'>
-        <TouchableOpacity onPress={() => navigation.goBack()} className='px-2'>
-          <Text className='px-2 py-2 font-semibold  text-lg'>Back</Text>
+    <View className="w-full h-full bg-white flex flex-col p-4">
+      <View className="flex flex-row justify-between items-center p-2">
+        <TouchableOpacity onPress={() => navigation.goBack()} className="px-2">
+          <Text className="px-2 py-2 font-semibold  text-lg">Back</Text>
         </TouchableOpacity>
         <View>
-          <Text className='px-2 py-2 font-semibold  text-center text-lg'>
+          <Text className="px-2 py-2 font-semibold  text-center text-lg">
             Chat Settings
           </Text>
         </View>
         <View>
-          <View className='py-6' />
+          <View className="py-6" />
         </View>
       </View>
       <ScrollView>
         {chatDetails && (
-          <View className='flex flex-col py-3'>
-            <Text className='font-bold text-xl text-center'>
-              ADMIN: {chatDetails.creator?.first_name}{' '}
+          <View className="flex flex-col py-3">
+            <Text className="font-bold text-xl text-center">
+              ADMIN:
+              {' '}
+              {chatDetails.creator?.first_name}
+              {' '}
               {chatDetails.creator?.last_name}
             </Text>
           </View>
         )}
-        <View className='flex flex-col'>
-          <View className='py-3 space-y-4'>
+        <View className="flex flex-col">
+          <View className="py-3 space-y-4">
             {errorMessage2 ? (
-              <Text className='text-red-500 p-1 text-center'>
+              <Text className="text-red-500 p-1 text-center">
                 Cannot be empty
               </Text>
             ) : null}
             <TextInput
               onChangeText={(text) => setUpdateChatName(text)}
-              className='rounded-lg w-full pl-4  block p-3  text-sm text-gray-900  border-l border  bg-gray-50  border-gray-300 focus:ring-blue-500 focus:border-blue-500 '
-              placeholder='Change Chat Name'
+              className="rounded-lg w-full pl-4  block p-3  text-sm text-gray-900  border-l border  bg-gray-50  border-gray-300 focus:ring-blue-500 focus:border-blue-500 "
+              placeholder="Change Chat Name"
               defaultValue={chatDetails?.name}
             />
             <TouchableOpacity
               onPress={handleUpdateChatDetails}
-              className=' p-2 bg-blue-700 rounded border border-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300'
+              className=" p-2 bg-blue-700 rounded border border-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300"
             >
-              <Text className='text-xl text-center truncate font-semibold'>
+              <Text className="text-xl text-center truncate font-semibold">
                 Update Chat Name
               </Text>
             </TouchableOpacity>
           </View>
         </View>
 
-        <View className='flex p-4'>
+        <View className="flex p-4">
           {errorMessage ? (
-            <Text className='text-red-500 p-1 text-center'>
+            <Text className="text-red-500 p-1 text-center">
               Cannot be empty
             </Text>
           ) : null}
-          <View className=' inline-flex flex-row  bg-gray-300/50 rounded-lg '>
+          <View className=" inline-flex flex-row  bg-gray-300/50 rounded-lg ">
             <TextInput
               onChangeText={(text) => setSearchQuery(text)}
-              className='rounded-lg w-full pl-4  block p-3  mr-8 text-sm text-gray-900 rounded-r-lg  border-l-2 border  bg-gray-50  border-gray-300 focus:ring-blue-500 focus:border-blue-500 '
-              placeholder='Search Contacts to add...'
+              className="rounded-lg w-full pl-4  block p-3  mr-8 text-sm text-gray-900 rounded-r-lg  border-l-2 border  bg-gray-50  border-gray-300 focus:ring-blue-500 focus:border-blue-500 "
+              placeholder="Search Contacts to add..."
             />
             <TouchableOpacity
               onPress={handleSearch}
-              className='absolute top-0 right-0 p-3 bg-blue-700 rounded-r-lg border border-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300'
+              className="absolute top-0 right-0 p-3 bg-blue-700 rounded-r-lg border border-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300"
             >
-              <FontAwesome5 name='search' size={18} color='black' />
+              <FontAwesome5 name="search" size={18} color="black" />
             </TouchableOpacity>
           </View>
         </View>
         {error && (
-          <View className='flex flex-col items-center justify-center'>
-            <Text className='text-lg font-semibold text-center text-red-600 truncate'>
+          <View className="flex flex-col items-center justify-center">
+            <Text className="text-lg font-semibold text-center text-red-600 truncate">
               User already in chat
             </Text>
           </View>
         )}
 
-        <View className='max-w-md divide-y divide-gray-200'>
+        <View className="max-w-md divide-y divide-gray-200">
           {contacts.map((contact) => (
             <ContactComp
               key={contact.user_id}
@@ -243,14 +246,14 @@ function ChatSettings(props) {
           ))}
         </View>
         <View>
-          <Text className='text-lg font-semibold text-center text-gray-900 truncate'>
+          <Text className="text-lg font-semibold text-center text-gray-900 truncate">
             Chat Members
           </Text>
         </View>
 
         <View>
-          {chatDetails &&
-            chatDetails.members.map((member) => (
+          {chatDetails
+            && chatDetails.members.map((member) => (
               <ChatMember
                 key={member.user_id}
                 member={member}

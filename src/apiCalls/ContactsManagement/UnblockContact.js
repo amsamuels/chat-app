@@ -1,4 +1,3 @@
-import { API_URL } from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const UnblockContact = async (
@@ -11,7 +10,7 @@ const UnblockContact = async (
 ) => {
   try {
     const token = await AsyncStorage.getItem('@token'); // Get token from AsyncStorage
-    const res = await fetch(`${API_URL}user/${id}/block`, {
+    const res = await fetch(`${process.env.API_URL}user/${id}/block`, {
       // Fetch API
       method: 'DELETE',
       headers: {

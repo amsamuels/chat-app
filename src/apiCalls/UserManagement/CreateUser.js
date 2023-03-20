@@ -1,5 +1,3 @@
-import { API_URL } from '@env';
-
 const CreateUser = async (
   user,
   setAccountCreated,
@@ -7,7 +5,7 @@ const CreateUser = async (
   setServerError,
 ) => {
   try {
-    const res = await fetch(`${API_URL}user`, {
+    const res = await fetch(`${process.env.API_URL}user`, {
       // Call the API_URL from .env
       method: 'POST',
       headers: {

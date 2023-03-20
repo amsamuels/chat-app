@@ -1,5 +1,4 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { API_URL } from '@env';
 
 const CreateChat = async (
   data,
@@ -11,7 +10,7 @@ const CreateChat = async (
   try {
     console.log(JSON.stringify(data));
     const token = await AsyncStorage.getItem('@token');
-    const res = await fetch(`${API_URL}chat`, {
+    const res = await fetch(`${process.env.API_URL}chat`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',

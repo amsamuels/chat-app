@@ -1,5 +1,4 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { API_URL } from '@env';
 
 const BlockContact = async (
   id,
@@ -12,7 +11,7 @@ const BlockContact = async (
 ) => {
   try {
     const token = await AsyncStorage.getItem('@token'); // get token from async storage
-    const res = await fetch(`${API_URL}user/${id}/block`, {
+    const res = await fetch(`${process.env.API_URL}user/${id}/block`, {
       // fetch from API
       method: 'POST', // set method to post
       headers: {

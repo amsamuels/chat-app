@@ -1,26 +1,27 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { API_URL } from '@env';
 
 const DeleteMessage = async (
-  chat_id,
-  message_id,
+  chatId,
+  messageId,
   setSuccessful,
   setError,
   setUnauthorized,
-  setForbidden,
   setNotFound,
   setServerError,
 ) => {
   try {
     const token = await AsyncStorage.getItem('@token');
-    const res = await fetch(`${API_URL}chat/${chat_id}/message/${message_id}`, {
-      method: 'DELETE',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        'X-Authorization': token,
+    const res = await fetch(
+      `${process.env.API_URL}chat/${chatId}/message/${messageId}`,
+      {
+        method: 'DELETE',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          'X-Authorization': token,
+        },
       },
-    });
+    );
     if (res?.status === 200) {
       console.log('Delete Message: Successfully Deleted Message');
       setSuccessful(true);

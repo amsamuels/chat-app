@@ -1,9 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { API_URL } from '@env';
 
 const EditMessage = async (
-  chat_id,
-  message_id,
+  chatId,
+  messageId,
   data,
   setSuccessful,
   setError,
@@ -14,15 +13,18 @@ const EditMessage = async (
 ) => {
   try {
     const token = await AsyncStorage.getItem('@token');
-    const res = await fetch(`${API_URL}chat/${chat_id}/message/${message_id}`, {
-      method: 'PATCH',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        'X-Authorization': token,
+    const res = await fetch(
+      `${process.env.API_URL}chat/${chatId}/message/${messageId}`,
+      {
+        method: 'PATCH',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          'X-Authorization': token,
+        },
+        body: JSON.stringify(data),
       },
-      body: JSON.stringify(data),
-    });
+    );
     if (res?.status === 200) {
       setSuccessful(true);
       console.log('Edit Message: Successfully Edited Message');
