@@ -5,7 +5,7 @@ const CreateChat = async (
   setSuccessful,
   setErrorCreatingChat,
   setUnauthorized,
-  setServerError,
+  setServerError
 ) => {
   try {
     console.log(JSON.stringify(data));

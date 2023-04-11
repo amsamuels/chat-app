@@ -62,7 +62,10 @@ function ChatSceen(props) {
   const handlSaveMessage = async () => {
     try {
       Keyboard.dismiss();
-      StoreData('draft', messageSchema.parse(sendMessages)); // Store the token in async storage
+      const existingDrafts = await AsyncStorage.getItem('@drafts');
+      const parsedDrafts = existingDrafts ? JSON.parse(existingDrafts) : [];
+      const updatedDrafts = [...parsedDrafts, sendMessages];
+      await AsyncStorage.setItem('@drafts', JSON.stringify(updatedDrafts)); // Store the drafts array in async storage
       setSendMessages('');
       setErrorMessage('');
     } catch (error) {
@@ -76,6 +79,7 @@ function ChatSceen(props) {
       if (draft !== null) {
         setSendMessages(draft);
       }
+      // remove the dract from async storage
       await AsyncStorage.removeItem('@draft');
     } catch (error) {
       console.log(error);
