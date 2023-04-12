@@ -10,3 +10,4 @@ export { default as ViewBlockedUsers } from './MainApp/ViewBlockedUsers';
 export { default as NewChat } from './MainApp/NewChat';
 export { default as ChatSceen } from './MainApp/ChatSceen';
 export { default as ChatSettings } from './MainApp/ChatSettings';
+export { default as Draft } from './MainApp/Draft';

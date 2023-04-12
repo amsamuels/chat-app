@@ -1,8 +1,6 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import {
-  Main, NewChat, ChatSceen, ChatSettings,
-} from '../screens';
+import { Main, NewChat, ChatSceen, ChatSettings, Draft } from '../screens';
 import { ROUTES } from '../constants';
 
 const Stack = createStackNavigator();
@@ -28,6 +26,11 @@ function ChatStack() {
       <Stack.Screen
         name={ROUTES.ADD_USER_TO_CHAT}
         component={ChatSettings}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name={ROUTES.MESSAGE_DRAFT}
+        component={Draft}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

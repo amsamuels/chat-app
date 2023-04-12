@@ -23,12 +23,11 @@ import StoreData from '../../apiCalls/StoreData';
 function ChatSceen(props) {
   const { navigation } = props;
   const { route } = props;
-  const [draft, setDraft] = useState('');
+  const { chat_id, message, draftId } = route.params;
   const [sendMessages, setSendMessages] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessage2, setErrorMessage2] = useState('');
   const [chatMessages, setChatMessages] = useState([]);
-  const { chat_id } = route.params;
   const messageSchema = z.string().min(1).max(1000);
   const [DeleteMessageSuccess, setDeleteMessageSuccess] = useState(false); // this is to check if the message was successfully deleted
   const [DeleteMessageError, setDeleteMessageError] = useState(false); // this is to check if there was an error deleting the message
@@ -38,6 +37,9 @@ function ChatSceen(props) {
   const [forbidden, setForbidden] = useState(false);
   const [notFound, setNotFound] = useState(false);
   const [serverError, setServerError] = useState(false);
+  const [selectedMessageId, setSelectedMessageId] = useState(null);
+  const [editedMessage, setEditedMessage] = useState('');
+  const [userId, setUserId] = useState(null);
   const handleSendMessage = async () => {
     try {
       Keyboard.dismiss();
@@ -59,12 +61,16 @@ function ChatSceen(props) {
       setErrorMessage(error.message);
     }
   };
-  const handlSaveMessage = async () => {
+  const handlSaveDraftMessage = async () => {
     try {
       Keyboard.dismiss();
       const existingDrafts = await AsyncStorage.getItem('@drafts');
       const parsedDrafts = existingDrafts ? JSON.parse(existingDrafts) : [];
-      const updatedDrafts = [...parsedDrafts, sendMessages];
+      const totalDrafts = parsedDrafts.length;
+      const updatedDrafts = [
+        ...parsedDrafts,
+        { sendMessages, chatId: chat_id, messageId: totalDrafts + 1 },
+      ];
       await AsyncStorage.setItem('@drafts', JSON.stringify(updatedDrafts)); // Store the drafts array in async storage
       setSendMessages('');
       setErrorMessage('');
@@ -72,20 +78,6 @@ function ChatSceen(props) {
       setErrorMessage(error.message);
     }
   };
-
-  const loadDraft = async () => {
-    try {
-      const draft = await AsyncStorage.getItem('@draft');
-      if (draft !== null) {
-        setSendMessages(draft);
-      }
-      // remove the dract from async storage
-      await AsyncStorage.removeItem('@draft');
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   const getChatMessages = async () => {
     try {
       const response = await GetChatdetails(
@@ -102,8 +94,6 @@ function ChatSceen(props) {
     }
   };
 
-  const [selectedMessageId, setSelectedMessageId] = useState(null);
-  const [editedMessage, setEditedMessage] = useState('');
   const handleEdit = (message_id) => {
     setSelectedMessageId(message_id);
     const messageToEdit = messages.find(
@@ -154,24 +144,43 @@ function ChatSceen(props) {
       // Handle the error
     }
   };
-  const [userId, setUserId] = useState(null);
+  const getUserId = async () => {
+    try {
+      const id = await AsyncStorage.getItem('@id');
+      setUserId(JSON.parse(id));
+    } catch (error) {
+      // Handle the error
+      console.log('Could not retrive user Id ', error);
+      await AsyncStorage.removeItem('@id');
+      await AsyncStorage.removeItem('@token');
+      navigation.navigate(ROUTES.LOGIN);
+    }
+  };
+
+  const handleDraft = async () => {
+    const messageText = await message;
+    setSendMessages(messageText);
+    const messageIdToRemove = await draftId; // ID of the message object to remove
+    const drafts = await AsyncStorage.getItem('@drafts');
+    const messages = JSON.parse(drafts);
+    const messageIndex = messages.findIndex(
+      (message) => message.messageId === messageIdToRemove
+    );
+    console.log(messageIndex);
+    if (messageIndex !== -1) {
+      messages.splice(messageIndex, 1);
+      await AsyncStorage.setItem('@drafts', JSON.stringify(messages));
+    }
+  };
 
   useEffect(() => {
+    if (route.params?.message) {
+      handleDraft();
+    }
+  }, [route.params?.message]);
+  useEffect(() => {
     getChatMessages();
-    const getUserId = async () => {
-      try {
-        const id = await AsyncStorage.getItem('@id');
-        setUserId(JSON.parse(id));
-      } catch (error) {
-        // Handle the error
-        console.log('Could not retrive user Id ', error);
-        await AsyncStorage.removeItem('@id');
-        await AsyncStorage.removeItem('@token');
-        navigation.navigate(ROUTES.LOGIN);
-      }
-    };
     getUserId();
-
     if (successful) {
       ShowToast('success', 'Request successful');
     }
@@ -201,6 +210,7 @@ function ChatSceen(props) {
     if (DeleteMessageSuccess) {
       getChatMessages();
     }
+
     const unsubscribe = navigation.addListener('focus', () => {
       // Call the functions that fetch data again to update the state
       getChatMessages();
@@ -345,12 +355,19 @@ function ChatSceen(props) {
             <Ionicons name='ios-send' size={24} color='black' />
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={handlSaveMessage}
+            onPress={handlSaveDraftMessage}
             className=' top-0 right-0 p-2'
           >
             <MaterialIcons name='save-alt' size={24} color='black' />
           </TouchableOpacity>
-          <TouchableOpacity onPress={loadDraft} className=' top-0 right-0 p-2'>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate(ROUTES.MESSAGE_DRAFT, {
+                chat_id: chat_id,
+              })
+            }
+            className=' top-0 right-0 p-2'
+          >
             <MaterialIcons name='drafts' size={24} color='black' />
           </TouchableOpacity>
         </View>

@@ -137,6 +137,9 @@ function Contacts(props) {
         >
           <Text className='px-2 py-2 font-semibold  text-lg'>Back</Text>
         </TouchableOpacity>
+        <Text className='uppercase font-bold  items-center text-center px-2 py-2 overflow-hidden'>
+          CONTACTS
+        </Text>
         <TouchableOpacity
           onPress={() => navigation.navigate(ROUTES.ADD_NEW_CONTACT)}
           className='px-2'

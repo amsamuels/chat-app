@@ -11,6 +11,7 @@ export default {
   CHAT_SCREEN: 'ChatScreen',
   NEW_CHAT: 'NewChat',
   ADD_USER_TO_CHAT: 'AddUserToChat',
+  MESSAGE_DRAFT: 'MessageDraft',
 
   SETTING_STACK: 'Setting',
   SETTING: 'SettingScreen',
