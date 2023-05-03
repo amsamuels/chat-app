@@ -18,7 +18,6 @@ function NewChat(props) {
 
   const onSubmit = async (data) => {
     const chatData = { name: Schema.parse(data.name) };
-
     try {
       setErrorCreatingChat(false);
       setSuccessful(false);

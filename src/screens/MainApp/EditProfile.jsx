@@ -9,9 +9,7 @@ import { useState, useEffect } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, TextInput } from '../../components';
-import {
-  ShowToast, FormSchema, GetUser, UpdateUser,
-} from '../../apiCalls';
+import { ShowToast, FormSchema, GetUser, UpdateUser } from '../../apiCalls';
 import { ROUTES } from '../../constants';
 
 function EditProfile(props) {
@@ -47,7 +45,7 @@ function EditProfile(props) {
         setBadRequest,
         setServerError,
         setNotFound,
-        setUpdateError,
+        setUpdateError
       );
     } catch (error) {
       console.error('Failed to create user:', error);
@@ -62,7 +60,7 @@ function EditProfile(props) {
       setGetUserSuccess,
       setUnauthorized,
       setErrorGettingUser,
-      setServerError,
+      setServerError
     );
     setProfile(getUser);
   }
@@ -109,70 +107,74 @@ function EditProfile(props) {
   ]);
 
   return (
-    <View className="w-full h-full bg-white flex flex-col">
-      <TouchableOpacity
-        onPress={() => navigation.navigate(ROUTES.SETTING)}
-        className="px-2 text-left"
-      >
-        <Text className="p-4 text-lg">Cancel</Text>
-      </TouchableOpacity>
-      <Text className="text-xl py-4 text-center font-semibold">
-        Update Your Profile
-      </Text>
+    <View className='w-full h-full bg-white flex flex-col'>
+      <View className='flex flex-row text-center justify-between p-4'>
+        <TouchableOpacity
+          onPress={() => navigation.navigate(ROUTES.SETTING)}
+          className='px-4'
+        >
+          <Text className='text-xl py-4 text-center font-semibold'>Cancel</Text>
+        </TouchableOpacity>
+        <Text className='text-xl py-4 text-center font-semibold'>
+          Update Profile
+        </Text>
+        <View className='px-6' />
+      </View>
+
       <ScrollView>
-        <View className="flex flex-col items-center px-4 mb-4">
+        <View className='flex flex-col px-8 mb-4'>
           {profile && (
             <FormProvider {...methods}>
-              <View className="py-6">
+              <View className='py-6'>
                 <TextInput
-                  name="first_name"
-                  label="First Name"
-                  placeholder="First Name"
-                  keyboardType="default"
+                  name='first_name'
+                  label='First Name'
+                  placeholder='First Name'
+                  keyboardType='default'
                   defaultValue={profile?.first_name}
                 />
                 {methods.formState.errors.first_name && (
-                  <Text className="text-red-700">
+                  <Text className='text-red-700'>
                     {methods.formState.errors.first_name.message}
                   </Text>
                 )}
                 <TextInput
-                  name="last_name"
-                  label="Last Name"
-                  placeholder="last name"
-                  keyboardType="default"
+                  name='last_name'
+                  label='Last Name'
+                  placeholder='last name'
+                  keyboardType='default'
                   defaultValue={profile?.last_name}
                 />
                 {methods.formState.errors.last_name && (
-                  <Text className="text-red-700">
+                  <Text className='text-red-700'>
                     {methods.formState.errors.last_name.message}
                   </Text>
                 )}
                 <TextInput
-                  name="email"
-                  label="Email"
-                  placeholder="jon.doe@email.com"
-                  keyboardType="email-address"
+                  name='email'
+                  label='Email'
+                  placeholder='jon.doe@email.com'
+                  keyboardType='email-address'
                   defaultValue={profile?.email}
                 />
                 {methods.formState.errors.email && (
-                  <Text className="text-red-700">
+                  <Text className='text-red-700'>
                     {methods.formState.errors.email.message}
                   </Text>
                 )}
                 <TextInput
-                  name="password"
-                  label="Password"
-                  placeholder="********"
+                  name='password'
+                  label='Password'
+                  placeholder='********'
                   secureTextEntry
                 />
                 {methods.formState.errors.password && (
-                  <Text className="text-red-700">
+                  <Text className='text-red-700'>
                     {methods.formState.errors.password.message}
                   </Text>
                 )}
               </View>
-              <Button onPress={methods.handleSubmit(onSubmit)} text="Update" />
+              <Button onPress={methods.handleSubmit(onSubmit)} text='Update' />
             </FormProvider>
           )}
         </View>

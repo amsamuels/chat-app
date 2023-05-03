@@ -113,7 +113,7 @@ const Settings = (props) => {
   }, [navigation]); // Add the navigation prop to the useEffect dependencies
 
   return (
-    <View className='h-full bg-neutral-900 '>
+    <View className='h-full bg-white '>
       <View className=' flex flex-col items-center pt-7'>
         <Image
           source={{
@@ -124,7 +124,7 @@ const Settings = (props) => {
           className=' w-48 h-48  rounded '
         />
         <View className='flex flex-col py-3'>
-          <Text className='font-bold text-3xl text-white'>
+          <Text className='font-bold text-3xl  text-gray-500'>
             {profile?.first_name} {profile?.last_name}
           </Text>
           <Text className='font-semibold text-lg text-center pt-2 text-gray-500'>

@@ -9,7 +9,6 @@ import {
 import {
   SendChatMessage,
   GetChatdetails,
-  DeleteMessage,
   EditMessage,
   ShowToast,
 } from '../../apiCalls';
@@ -17,8 +16,13 @@ import { useState, useEffect } from 'react';
 import * as z from 'zod';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ROUTES, formatDuration } from '../../constants';
-import StoreData from '../../apiCalls/StoreData';
+import { ROUTES } from '../../constants';
+import {
+  ScheduleMessageModal,
+  EditDeleteModal,
+  EditModal,
+  MessageComp,
+} from '../../components';
 
 function ChatSceen(props) {
   const { navigation } = props;
@@ -38,8 +42,10 @@ function ChatSceen(props) {
   const [notFound, setNotFound] = useState(false);
   const [serverError, setServerError] = useState(false);
   const [selectedMessageId, setSelectedMessageId] = useState(null);
-  const [editedMessage, setEditedMessage] = useState('');
   const [userId, setUserId] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [editedMessage, setEditedMessage] = useState('');
+
   const handleSendMessage = async () => {
     try {
       Keyboard.dismiss();
@@ -61,37 +67,56 @@ function ChatSceen(props) {
       setErrorMessage(error.message);
     }
   };
-  const handlSaveDraftMessage = async () => {
+  const handlSaveDraftMessage = async (scheduleTime) => {
     try {
-      Keyboard.dismiss();
-      const existingDrafts = await AsyncStorage.getItem('@drafts');
-      const parsedDrafts = existingDrafts ? JSON.parse(existingDrafts) : [];
-      const totalDrafts = parsedDrafts.length;
-      const updatedDrafts = [
-        ...parsedDrafts,
-        { sendMessages, chatId: chat_id, messageId: totalDrafts + 1 },
-      ];
-      await AsyncStorage.setItem('@drafts', JSON.stringify(updatedDrafts)); // Store the drafts array in async storage
-      setSendMessages('');
-      setErrorMessage('');
+      if (scheduleTime) {
+        console.log(scheduleTime);
+        // send message with schedule time
+        const existingDrafts = await AsyncStorage.getItem('@drafts');
+        const parsedDrafts = existingDrafts ? JSON.parse(existingDrafts) : [];
+        const totalDrafts = parsedDrafts.length;
+        const now = new Date(); // get current date and time
+        const updatedDrafts = [
+          ...parsedDrafts,
+          {
+            sendMessages,
+            chatId: chat_id,
+            messageId: totalDrafts + 1,
+            createdAt: now,
+            timeSchedule: scheduleTime,
+          },
+        ];
+        await AsyncStorage.setItem('@drafts', JSON.stringify(updatedDrafts)); // Store the drafts array in async storage
+        setSendMessages('');
+        setErrorMessage('');
+      } else {
+        // save message as draft
+        const existingDrafts = await AsyncStorage.getItem('@drafts');
+        const parsedDrafts = existingDrafts ? JSON.parse(existingDrafts) : [];
+        const totalDrafts = parsedDrafts.length;
+        const now = new Date(); // get current date and time
+        const updatedDrafts = [
+          ...parsedDrafts,
+          {
+            sendMessages,
+            chatId: chat_id,
+            messageId: totalDrafts + 1,
+            createdAt: now,
+          },
+        ];
+        await AsyncStorage.setItem('@drafts', JSON.stringify(updatedDrafts)); // Store the drafts array in async storage
+        setSendMessages('');
+        setErrorMessage('');
+        console.log('Saving message as draft:', message);
+      }
+      setShowModal(false);
     } catch (error) {
       setErrorMessage(error.message);
     }
   };
-  const getChatMessages = async () => {
-    try {
-      const response = await GetChatdetails(
-        chat_id,
-        setError,
-        setUnauthorized,
-        setForbidden,
-        setNotFound,
-        setServerError
-      );
-      setChatMessages(response);
-    } catch (error) {
-      // Handle the error
-    }
+
+  const handleCloseModal = () => {
+    setShowModal(false);
   };
 
   const handleEdit = (message_id) => {
@@ -102,48 +127,6 @@ function ChatSceen(props) {
     setEditedMessage(messageToEdit.message);
   };
 
-  const handleUpdate = async (message_id) => {
-    try {
-      const messageData = { message: messageSchema.parse(editedMessage) };
-      await EditMessage(
-        chat_id,
-        message_id,
-        messageData,
-        setSuccessful,
-        setError,
-        setUnauthorized,
-        setForbidden,
-        setNotFound,
-        setServerError
-      );
-      setErrorMessage2('');
-      setSelectedMessageId(null);
-      getChatMessages();
-    } catch (error) {
-      // Handle the error
-      setErrorMessage2(error.message);
-    }
-  };
-
-  const handleDelete = async (message_id) => {
-    try {
-      setDeleteMessageSuccess(false);
-      setDeleteMessageError(false);
-      const response = await DeleteMessage(
-        chat_id,
-        message_id,
-        setSuccessful,
-        setError,
-        setUnauthorized,
-        setForbidden,
-        setNotFound,
-        setServerError
-      );
-      getChatMessages();
-    } catch (error) {
-      // Handle the error
-    }
-  };
   const getUserId = async () => {
     try {
       const id = await AsyncStorage.getItem('@id');
@@ -166,13 +149,37 @@ function ChatSceen(props) {
     const messageIndex = messages.findIndex(
       (message) => message.messageId === messageIdToRemove
     );
-    console.log(messageIndex);
+
     if (messageIndex !== -1) {
       messages.splice(messageIndex, 1);
       await AsyncStorage.setItem('@drafts', JSON.stringify(messages));
     }
   };
+  const getChatMessages = async () => {
+    try {
+      const response = await GetChatdetails(
+        chat_id,
+        setError,
+        setUnauthorized,
+        setForbidden,
+        setNotFound,
+        setServerError
+      );
+      setChatMessages(response);
+    } catch (error) {
+      // Handle the error
+    }
+  };
+  useEffect(() => {
+    getChatMessages(); // Call the function on mount
 
+    const interval = setInterval(() => {
+      console.log('running this now');
+      getChatMessages(); // Call the function every minute
+    }, 5000);
+
+    return () => clearInterval(interval); // Clean up the interval
+  }, []);
   useEffect(() => {
     if (route.params?.message) {
       handleDraft();
@@ -180,6 +187,7 @@ function ChatSceen(props) {
   }, [route.params?.message]);
   useEffect(() => {
     getChatMessages();
+
     getUserId();
     if (successful) {
       ShowToast('success', 'Request successful');
@@ -224,86 +232,49 @@ function ChatSceen(props) {
       if (selectedMessageId === item.message_id) {
         return (
           // render edit modal
-          <View className=' inset-0  bg-opacity-50'>
-            <View className='relative bg-white mx-auto w-80 my-10 p-4 rounded-lg'>
-              <TextInput
-                value={editedMessage}
-                onChangeText={setEditedMessage}
-                className='border-b pb-1 mb-4 w-full'
-              />
-              {errorMessage2 ? (
-                <Text className='text-red-500 p-1 text-center'>
-                  Cannot be empty
-                </Text>
-              ) : null}
-              <View className='flex flex-row space-x-3 justify-end'>
-                <TouchableOpacity
-                  onPress={() => {
-                    // call function to update message in data source
-                    handleUpdate(selectedMessageId);
-                  }}
-                  className='bg-blue-500 px-4 py-2 rounded-md text-white'
-                >
-                  <Text>Save</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => {
-                    // call function to update message in data source
-                    setSelectedMessageId(null);
-                  }}
-                  className='bg-blue-500 px-4 py-2 rounded-md text-white'
-                >
-                  <Text>Cancel</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
+          <EditModal
+            chat_id={chat_id}
+            editedMessage={editedMessage}
+            setEditedMessage={setEditedMessage}
+            selectedMessageId={selectedMessageId}
+            setSelectedMessageId={setSelectedMessageId}
+            errorMessage2={errorMessage2}
+            setErrorMessage2={setErrorMessage2}
+            setSuccessful={setSuccessful}
+            setError={setError}
+            setUnauthorized={setUnauthorized}
+            setForbidden={setForbidden}
+            setNotFound={setNotFound}
+            setServerError={setServerError}
+          />
         );
       }
       return (
         // render message with Edit/Delete buttons
-        <View className='items-end'>
-          <View className='border rounded w-52 bg-sky-400 px-2 py-2 mx-2 my-2'>
-            <View className='flex flex-row justify-between'>
-              <Text className='text-base font-semibold  overflow-hidden'>
-                {item.author.first_name}:{item.message}
-              </Text>
-              <Text>{formatDuration(item.timestamp)}</Text>
-            </View>
-            <View className='relative inline-block text-left'>
-              <View className='flex flex-row space-x-3'>
-                <TouchableOpacity
-                  className='border rounded bg-sky-400 px-2 py-2 mx-2 my-2'
-                  onPress={() => {
-                    handleDelete(item.message_id);
-                  }}
-                >
-                  <Text>Delete</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  className='border rounded bg-sky-400 px-2 py-2 mx-2 my-2'
-                  onPress={() => {
-                    handleEdit(item.message_id);
-                  }}
-                >
-                  <Text>Edit</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        </View>
+        <EditDeleteModal
+          author={item.author.first_name}
+          message={item.message}
+          timestamp={item.timestamp}
+          chat_id={chat_id}
+          message_id={item.message_id}
+          getChatMessages={getChatMessages}
+          setSuccessful={setSuccessful}
+          setError={setError}
+          setUnauthorized={setUnauthorized}
+          setForbidden={setForbidden}
+          setNotFound={setNotFound}
+          setServerError={setServerError}
+          handleEdit={handleEdit}
+        />
       );
     }
     return (
       // render message without Edit/Delete buttons
-      <View className='border rounded w-52 bg-slate-400 px-2 py-2 mx-2 my-2'>
-        <View className='flex flex-row justify-between'>
-          <Text className='text-base font-semibold  overflow-hidden'>
-            {item.author.first_name}:{item.message}
-          </Text>
-          <Text>{formatDuration(item.timestamp)}</Text>
-        </View>
-      </View>
+      <MessageComp
+        author={item.author.first_name}
+        message={item.message}
+        timestamp={item.timestamp}
+      />
     );
   };
 
@@ -354,12 +325,24 @@ function ChatSceen(props) {
           >
             <Ionicons name='ios-send' size={24} color='black' />
           </TouchableOpacity>
+
           <TouchableOpacity
-            onPress={handlSaveDraftMessage}
             className=' top-0 right-0 p-2'
+            onPress={() => setShowModal(true)}
           >
             <MaterialIcons name='save-alt' size={24} color='black' />
           </TouchableOpacity>
+          <ScheduleMessageModal
+            showModal={showModal}
+            onCloseModal={handleCloseModal}
+            onSave={handlSaveDraftMessage}
+            setError={setError}
+            setUnauthorized={setUnauthorized}
+            setForbidden={setForbidden}
+            setNotFound={setNotFound}
+            setServerError={setServerError}
+            getChatMessages={getChatMessages}
+          />
           <TouchableOpacity
             onPress={() =>
               navigation.navigate(ROUTES.MESSAGE_DRAFT, {

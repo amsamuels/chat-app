@@ -8,7 +8,6 @@ const CreateChat = async (
   setServerError
 ) => {
   try {
-    console.log(JSON.stringify(data));
     const token = await AsyncStorage.getItem('@token');
     const res = await fetch(`${process.env.API_URL}chat`, {
       method: 'POST',

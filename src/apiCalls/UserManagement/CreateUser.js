@@ -2,7 +2,7 @@ const CreateUser = async (
   user,
   setAccountCreated,
   setSignupError,
-  setServerError,
+  setServerError
 ) => {
   try {
     const res = await fetch(`${process.env.API_URL}user`, {
@@ -14,7 +14,7 @@ const CreateUser = async (
       },
       body: JSON.stringify(user),
     });
-    if (res?.status === 200) {
+    if (res?.status === 201) {
       // If the status is 200
       console.log('createUser: Account successfully created'); // Log a message
       setAccountCreated(true); // Set the accountCreated state to true

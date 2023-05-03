@@ -101,10 +101,13 @@ function SignUp(props) {
               </Text>
             )}
           </View>
-          <Button
-            onPress={methods.handleSubmit(onSubmit)}
-            text='Create Account'
-          />
+          <View className='flex flex-col space-y-4'>
+            <Button onPress={methods.handleSubmit(onSubmit)} text='CREATE' />
+            <Button
+              onPress={() => navigation.navigate(ROUTES.LOGIN)}
+              text='LOGIN'
+            />
+          </View>
         </FormProvider>
       </View>
     </View>
